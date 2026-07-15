@@ -31,7 +31,7 @@ This is a **C# Client Mod** for integrating *Supermarket Simulator* into the **A
 * Connection HUD showing server status in the top-left corner
 * Ingame Notifications for Items and Locations
 
-## 🛠️ Installation
+## Installation
 
 ### 1. Install BepInEx 6
 1. Download **BepInEx 6 (Unity IL2CPP for Windows x64)** from the official repository.
@@ -44,7 +44,7 @@ This is a **C# Client Mod** for integrating *Supermarket Simulator* into the **A
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 1. Launch **Supermarket Simulator** once to let BepInEx generate the default configuration file, then close the game.
 2. Navigate to `BepInEx/config/` and open `com.lemix.supermarket.archipelago.cfg` in a text editor (like Notepad).
@@ -72,7 +72,7 @@ Password =
 4.  Save the file, launch the game, click on AP Server Connect Button in the Main Menu, and you will automatically connect. An active **Connection HUD** in the top-left corner of the screen will show your status.
     
 
-## 💻 Compiling From Source
+## Compiling From Source
 
 If you want to modify or compile this mod yourself:
 
@@ -88,6 +88,6 @@ If you want to modify or compile this mod yourself:
 Since Supermarket Simulator uses the Unity IL2CPP backend, you need the stripped assembly DLLs for compiling. You can find all DLLs in `BepInEx/interop/` and `BepInEx/core/`.
     
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License**.
