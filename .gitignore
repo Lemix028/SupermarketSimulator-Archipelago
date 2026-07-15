@@ -1,0 +1,14 @@
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/1
+.DS_Store
+Thumbs.db
