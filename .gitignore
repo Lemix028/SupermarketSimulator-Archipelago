@@ -12,3 +12,8 @@ x64/
 x86/1
 .DS_Store
 Thumbs.db
+test.bat
+build.bat
+build.py
+__pycache__/
+*.pyc

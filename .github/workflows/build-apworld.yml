@@ -1,0 +1,28 @@
+name: Build and Release APWorld
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-apworld:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare APWorld files
+        run: |
+          mkdir -p supermarket_simulator
+          cp -r apworld/supermarket_simulator/* supermarket_simulator/
+
+      - name: Zip APWorld
+        run: |
+          zip -r supermarket_simulator.apworld supermarket_simulator
+
+      - name: Upload APWorld to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: supermarket_simulator.apworld
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
