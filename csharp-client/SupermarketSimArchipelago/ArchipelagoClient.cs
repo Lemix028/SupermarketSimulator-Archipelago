@@ -115,9 +115,28 @@ namespace SupermarketArchipelago
         {
             if (_session != null)
             {
-                _session.Items.ItemReceived -= OnItemReceived;
-                _session.Socket.SocketClosed -= OnSocketClosed;
-                _session.Socket.DisconnectAsync().Wait();
+                try
+                {
+                    _session.Items.ItemReceived -= OnItemReceived;
+                    _session.Socket.SocketClosed -= OnSocketClosed;
+                }
+                catch (Exception ex)
+                {
+                    _log?.LogWarning($"Error removing socket event listeners: {ex.Message}");
+                }
+
+                try
+                {
+                    if (_session.Socket != null && IsConnected)
+                    {
+                        _session.Socket.DisconnectAsync().Wait();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Ignore exceptions during socket disconnection (e.g. if the socket was already disconnected/offline)
+                    _log?.LogWarning($"Ignored socket disconnect exception: {ex.Message}");
+                }
 
                 ReceivedItemIDs.Clear();
                 ArchipelagoPriceManager.ClearRegistry();
