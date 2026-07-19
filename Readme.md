@@ -54,33 +54,32 @@ The repository also includes the Archipelago World definition (APWorld) located 
 
 ---
 
-## Configuration
+## Connection & Setup
 
-1. Launch **Supermarket Simulator** once to let BepInEx generate the default configuration file, then close the game.
-2. Navigate to `BepInEx/config/` and open `com.lemix028.supermarketsimulator.archipelago.cfg` in a text editor (like Notepad).
-3. Fill in your Archipelago connection details:
+You can set up your Archipelago connection credentials directly in-game or via the configuration file.
 
-```ini
-[Archipelago]
+### 1. Connecting In-Game (Recommended)
+1. Launch **Supermarket Simulator**.
+2. Click the **AP Server Connect** button in the main menu to open the connection details window.
+3. Enter your connection details:
+   * **Server Address**: The address of your Archipelago server (e.g., `archipelago.gg:38281`). You can use **Ctrl+V** to paste directly from your clipboard.
+   * **Slot Name**: Your player slot name as configured in your YAML.
+   * **Password**: The password for the room (leave blank if none).
+4. Click **Connect & Save**. The credentials will be saved automatically, and the mod will attempt to connect.
+5. Once connected, your status and goal progress will be displayed in the **Connection HUD** in the top-left corner of the screen. You can now load your save game or start a new one!
 
-## The connection address of the Archipelago server (IP:Port)
-# Setting type: String
-# Default value: archipelago.gg:38281
-ServerAddress = archipelago.gg:38281
-
-## Your exact slot name defined in your player YAML configuration
-# Setting type: String
-# Default value: Player
-SlotName = Lemix028
-
-## The room password (leave empty if the host did not set one)
-# Setting type: String
-# Default value:
-Password =
-
-
-```
-4.  Save the file, launch the game, click on AP Server Connect Button in the Main Menu, and you will automatically connect. An active **Connection HUD** in the top-left corner of the screen will show your status.
+### 2. Alternative: Editing the Config File
+If you prefer, you can pre-configure your credentials before launching the game:
+1. Launch the game once so BepInEx can generate the config file, then close the game.
+2. Open `<GameDir>/BepInEx/config/com.lemix028.supermarketsimulator.archipelago.cfg` in a text editor.
+3. Fill in your server details:
+   ```ini
+   [Archipelago]
+   ServerAddress = archipelago.gg:38281
+   SlotName = Lemix028
+   Password = 
+   ```
+4. Save the file and start the game. Click **AP Server Connect** in the Main Menu to open the login UI with these details pre-filled, then click **Connect** to establish the connection.
     
 
 ## Compiling From Source
