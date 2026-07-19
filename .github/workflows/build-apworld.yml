@@ -13,6 +13,9 @@ on:
         required: false
         default: 'v0.2.1'
 
+permissions:
+  contents: write
+
 jobs:
   build-apworld:
     runs-on: ubuntu-latest
