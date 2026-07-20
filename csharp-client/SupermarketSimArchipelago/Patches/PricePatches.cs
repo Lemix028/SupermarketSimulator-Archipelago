@@ -1,4 +1,4 @@
-﻿using __Project__.Scripts.Computer.Vending_Machine;
+using __Project__.Scripts.Computer.Vending_Machine;
 using __Project__.Scripts.WholeSale;
 using HarmonyLib;
 using SupermarketSimArchipelago;
@@ -221,108 +221,6 @@ namespace SupermarketArchipelago
             float randomizedCost = __instance.m_Section.Cost;
             __instance.m_CostText.text = "$" + randomizedCost.ToString("F2");
         }
-
-
-        // TMPro String Parsing Helper for Price Texts
-        private static float ParsePriceFromText(string text)
-        {
-            if (string.IsNullOrEmpty(text)) return 0f;
-
-            string cleanText = text.Replace("$", "").Replace("€", "").Replace(",", ".").Trim();
-            cleanText = Regex.Replace(cleanText, "<[^>]*>", "");
-
-            if (float.TryParse(cleanText, NumberStyles.Any, CultureInfo.InvariantCulture, out float result))
-            {
-                return result;
-            }
-
-            return 0f;
-        }
-
-        // Process Store Card Price Randomization for both Products and Furniture (UI)
-        private static void ProcessStoreCard(SalesUIElement element, int productId, bool isFurniture)
-        {
-            if (element == null || element.m_UnitPriceText == null) return;
-
-            string rawUiText = element.m_UnitPriceText.text;
-            if (string.IsNullOrEmpty(rawUiText) || rawUiText == "$0.00" || rawUiText == "0") return;
-
-            float originalPrice = ParsePriceFromText(rawUiText);
-            if (originalPrice <= 0f) return;
-
-            float randomizedPrice = isFurniture
-                ? ArchipelagoPriceManager.GetFurniturePrice(productId, originalPrice)
-                : ArchipelagoPriceManager.GetProductCost(productId, originalPrice);
-
-            element.m_UnitPriceText.text = "$" + randomizedPrice.ToString("F2");
-            element.UpdateTotalPrice();
-        }
-
-        // Products and Furniture Store Card Price Randomization Hooks (UI)
-        [HarmonyPatch(typeof(SalesItem), nameof(SalesItem.Setup), new Type[] { typeof(int), typeof(ProductViewer) })]
-        [HarmonyPostfix]
-        public static void SalesItemSetupPostfix(SalesItem __instance, int productID)
-        {
-            ProcessStoreCard(__instance, productID, false);
-        }
-
-        [HarmonyPatch(typeof(FurnitureSalesItem), nameof(FurnitureSalesItem.Setup), new Type[] { typeof(int), typeof(FurnituresViewer) })]
-        [HarmonyPostfix]
-        public static void FurnitureSetupPostfix(FurnitureSalesItem __instance, int productID)
-        {
-            ProcessStoreCard(__instance, productID, true);
-        }
-
-        [HarmonyPatch(typeof(FurnitureSalesItem), nameof(FurnitureSalesItem.ReSetup), new Type[] { typeof(int) })]
-        [HarmonyPostfix]
-        public static void FurnitureReSetupPostfix(FurnitureSalesItem __instance, int productID)
-        {
-            ProcessStoreCard(__instance, productID, true);
-        }
-
-        [HarmonyPatch(typeof(SalesUIElement), nameof(SalesUIElement.UpdateLocalizeText), new Type[] { typeof(UnityEngine.Localization.Locale) })]
-        [HarmonyPostfix]
-        public static void SalesUIElementLocalizePostfix(SalesUIElement __instance)
-        {
-            if (__instance == null) return;
-            bool isFurniture = __instance.m_SalesType != SalesType.PRODUCT;
-            ProcessStoreCard(__instance, __instance.m_ProductID, isFurniture);
-        }
-
-        // Cart initialization hook to ensure correct randomized prices are displayed in the cart
-        [HarmonyPatch(typeof(SalesUIElement), nameof(SalesUIElement.Setup), new Type[] { typeof(ItemQuantity), typeof(SalesType) })]
-        [HarmonyPostfix]
-        public static void SalesUIElementCartSetupPostfix(SalesUIElement __instance)
-        {
-            if (__instance == null) return;
-            bool isFurniture = __instance.m_SalesType != SalesType.PRODUCT;
-            ProcessStoreCard(__instance, __instance.m_ProductID, isFurniture);
-
-        }
-        [HarmonyPatch(typeof(SalesUIElement), nameof(SalesUIElement.UpdateTotalPrice))]
-        [HarmonyPostfix]
-        public static void UpdateTotalPricePostfix(SalesUIElement __instance)
-        {
-            if (__instance == null || __instance.m_UnitPriceText == null) return;
-
-            float activeUnitPrice = ParsePriceFromText(__instance.m_UnitPriceText.text);
-            if (activeUnitPrice <= 0f) return;
-
-            int quantity = 1;
-            if (__instance.m_ItemCountInput != null && int.TryParse(__instance.m_ItemCountInput.text, out int inputCount))
-            {
-                quantity = inputCount;
-            }
-
-            float newTotalPrice = (float)Math.Round(activeUnitPrice * quantity, 2);
-
-            __instance.m_TotalPrice = newTotalPrice;
-            if (__instance.m_TotalPriceText != null)
-            {
-                __instance.m_TotalPriceText.text = "$" + newTotalPrice.ToString("F2");
-            }
-        }
-
 
     }
 }
