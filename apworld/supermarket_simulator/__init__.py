@@ -1,10 +1,10 @@
 from worlds.AutoWorld import World
 from BaseClasses import Region, Entrance, Location, ItemClassification
-from .Items import item_table, SupermarketItem, dlc_licenses
-from .Locations import location_table
-from .Options import SupermarketOptions
+from .items import item_table, SupermarketItem, dlc_licenses
+from .locations import location_table
+from .options import SupermarketOptions
 from .webhost import SupermarketSimulatorWebWorld
-from .Rules import set_rules
+from .rules import set_rules
 
 class SupermarketLocation(Location):
     game = "Supermarket Simulator"
@@ -260,7 +260,7 @@ class SupermarketWorld(World):
         victory_location.place_locked_item(self.create_item("Victory"))
 
     def set_rules(self) -> None:
-        from .Rules import set_rules as _set_rules
+        from .rules import set_rules as _set_rules
         _set_rules(self)
 
     def get_filler_item_name(self) -> str:
@@ -287,7 +287,7 @@ class SupermarketWorld(World):
 
     def fill_slot_data(self) -> dict:
         # Calculate total active licenses (base + active DLCs)
-        from .Items import item_table, dlc_licenses
+        from .items import item_table, dlc_licenses
         active_dlcs = self.options.active_dlcs.value
         active_licenses = []
 

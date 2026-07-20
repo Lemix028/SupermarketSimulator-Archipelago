@@ -51,7 +51,7 @@ def set_rules(self) -> None:
     elif goal_value == 2:
         # --- Goal: Collect All Licenses ---
         # Collect every license name that is active in this seed (base + active DLCs).
-        from .Items import item_table, dlc_licenses
+        from .items import item_table, dlc_licenses
 
         active_dlcs = self.options.active_dlcs.value
         active_license_names = []

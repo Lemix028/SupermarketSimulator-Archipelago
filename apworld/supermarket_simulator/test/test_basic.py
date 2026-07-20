@@ -1,7 +1,7 @@
 import unittest
 from test.bases import WorldTestBase
 from BaseClasses import ItemClassification
-from worlds.supermarket_simulator.Options import StartingLicenses, DisabledTraps, StartingFurniture
+from worlds.supermarket_simulator.options import StartingLicenses, DisabledTraps, StartingFurniture
 from Fill import distribute_items_restrictive
 
 class SupermarketSimulatorTestBase(WorldTestBase):

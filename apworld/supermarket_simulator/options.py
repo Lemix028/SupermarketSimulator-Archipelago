@@ -1,7 +1,7 @@
 from Options import Range, Toggle, DefaultOnToggle, OptionList, Choice, PerGameCommonOptions, OptionSet
 from dataclasses import dataclass
-from .Items import ALL_LICENSES, ALL_FURNITURE, ALL_VEHICLES, ALL_TRAPS, dlc_licenses
-from .licenseData import LICENSE_DETAILS
+from .items import ALL_LICENSES, ALL_FURNITURE, ALL_VEHICLES, ALL_TRAPS, dlc_licenses
+from .license_data import LICENSE_DETAILS
 
 class ActiveDLCs(OptionSet):
     """Select which DLCs are active. 
