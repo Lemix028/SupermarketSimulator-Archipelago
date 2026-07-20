@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [0.2.1] - 2026-07-19
+## [0.2.1] - 2026-07-19 — Initial Public Release
 
 ### APWorld (Python / Archipelago Generator)
 
@@ -29,7 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Thread Safety (AccessViolationException) Crash: Wrapped all UI notifications in the Unity main thread dispatcher to prevent crashes during rapid item receipt (e.g. releases).
 - German Comment Translation: All remaining German source comments and log text have been translated to English.
 
-## [0.2.0] - 2026-07-18 — Initial Public Release
+## [0.2.0] - 2026-07-18 
 
 ### APWorld (Python / Archipelago Generator)
 
