@@ -14,7 +14,7 @@
 2.  Extract the contents of the `.zip` archive directly into your main **Supermarket Simulator** installation folder (the directory containing `Supermarket Simulator.exe`).
 3.  Launch the game once to allow BepInEx to generate its folder structure, then close the game.
 4.  Download the latest release of the **Supermarket Simulator Archipelago Mod** from the [GitHub Releases page](https://github.com/Lemix028/SupermarketSimulator-Archipelago/releases).
-5.  Copy `SupermarketArchipelago.dll` and the other two required dependency `.dll` files (`Archipelago.MultiClient.Net.dll` and `Newtonsoft.Json.dll`) directly into the `<GameDir>/BepInEx/plugins/` folder.
+5.  Copy `SupermarketSimArchipelago.dll` and the other two required dependency `.dll` files (`Archipelago.MultiClient.Net.dll` and `Newtonsoft.Json.dll`) directly into the `<GameDir>/BepInEx/plugins/` folder.
 6.  You can configure your credentials by editing `<GameDir>/BepInEx/config/com.lemix028.supermarketsimulator.archipelago.cfg` in a text editor.
 
 
