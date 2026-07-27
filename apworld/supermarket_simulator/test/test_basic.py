@@ -346,4 +346,63 @@ class TestSupermarketSimulatorExcludedLicensesClassification(SupermarketSimulato
         
         self.assertEqual(item_22.classification, ItemClassification.useful)
         self.assertEqual(item_66.classification, ItemClassification.useful)
-        self.assertEqual(item_23.classification, ItemClassification.progression)
+        self.assertEqual(item_23.classification, ItemClassification.progression)
+
+
+class TestSupermarketSimulatorLocationRules(SupermarketSimulatorTestBase):
+    options = {
+        "max_store_level": 50,
+        "store_level_interval": 1,
+        "max_days_completed": 100,
+        "days_completed_interval": 1,
+        "enable_storage_locks": True,
+        "enable_section_locations": True,
+        "enable_money_milestones": True,
+        "max_money_milestone": 5000,
+        "money_milestone_interval": 1000,
+        "customer_checkout_locations": 10,
+    }
+
+    def test_milestone_chaining_logic(self) -> None:
+        self.world_setup()
+
+        # Store Level 1 location should NOT exist (starts at Store Level 2)
+        with self.assertRaises(KeyError):
+            self.multiworld.get_location("Store Level 1", self.player)
+
+        # Store Level 2 should be reachable initially
+        self.assertTrue(self.can_reach("Store Level 2"))
+        # Store Level 3 requires Store Level 2
+        level_3_loc = self.multiworld.get_location("Store Level 3", self.player)
+        self.assertTrue(level_3_loc.can_reach(self.multiworld.state))
+
+        # Day 1 Completed should be reachable
+        self.assertTrue(self.can_reach("Day 1 Completed"))
+
+        # Earn 1000$ should be reachable initially
+        self.assertTrue(self.can_reach("Earn 1000$"))
+        # Earn 2000$ should be reachable when Earn 1000$ is reached
+        earn_2000_loc = self.multiworld.get_location("Earn 2000$", self.player)
+        self.assertTrue(earn_2000_loc.can_reach(self.multiworld.state))
+
+        # Storage Room Upgrade 1 requires Storage Room Upgrade 1 item
+        storage_1_loc = self.multiworld.get_location("Storage Room Upgrade 1", self.player)
+        self.assertFalse(storage_1_loc.can_reach(self.multiworld.state))
+        self.collect_by_name("Storage Room Upgrade 1")
+        self.assertTrue(storage_1_loc.can_reach(self.multiworld.state))
+
+        # Starting license (License 21) should NOT generate a Purchase License 21 location
+        with self.assertRaises(KeyError):
+            self.multiworld.get_location("Purchase License 21", self.player)
+
+        # Purchase License 22 location should exist and require License 22 item
+        lic_22_loc = self.multiworld.get_location("Purchase License 22", self.player)
+        self.assertFalse(lic_22_loc.can_reach(self.multiworld.state))
+        self.collect_by_name("License 22")
+        self.assertTrue(lic_22_loc.can_reach(self.multiworld.state))
+
+        # Customer Checkout 1 location should exist and be reachable initially
+        self.assertTrue(self.can_reach("Customer Checkout 1"))
+        checkout_2_loc = self.multiworld.get_location("Customer Checkout 2", self.player)
+        self.assertTrue(checkout_2_loc.can_reach(self.multiworld.state))
+

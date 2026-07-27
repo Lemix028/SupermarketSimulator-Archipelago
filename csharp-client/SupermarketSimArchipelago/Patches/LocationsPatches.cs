@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using System;
 
 namespace SupermarketArchipelago
@@ -29,9 +29,9 @@ namespace SupermarketArchipelago
     {
         public static void Postfix(DayCycleManager __instance)
         {
-            int completedDay = __instance.CurrentDay;
+            int completedDay = __instance.CurrentDay - 1;
 
-            if (completedDay > ArchipelagoConfig.MaxDaysCompleted) return;
+            if (completedDay < 1 || completedDay > ArchipelagoConfig.MaxDaysCompleted) return;
 
             if (completedDay % ArchipelagoConfig.DaysCompletedInterval == 0)
             {

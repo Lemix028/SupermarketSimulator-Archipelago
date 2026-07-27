@@ -28,7 +28,7 @@ class Goal(Choice):
     option_level = 0
     option_days = 1
     option_all_licenses = 2
-    default = 0
+    default = 2
 
 class PriceRandomization(Choice):
     """Randomizes the prices of items in the store. This affects the price you pay for items.
@@ -236,6 +236,20 @@ class FreeCustomizables(Toggle):
     display_name = "Free Customizables"
     default = 0
 
+class CustomerCheckoutLocations(Range):
+    """Number of Customer Checkout location checks generated in the multiworld."""
+    display_name = "Customer Checkout Locations"
+    range_start = 0
+    range_end = 100
+    default = 100
+
+class CustomerCheckoutChance(Range):
+    """Percentage chance (1-100%) per checked-out customer to trigger a Customer Checkout location check."""
+    display_name = "Customer Checkout Chance"
+    range_start = 1
+    range_end = 100
+    default = 5
+
 item_to_dlcs = {}
 # Required DLCs for each item
 for dlc_key, dlc_items in dlc_licenses.items():
@@ -302,3 +316,5 @@ class SupermarketOptions(PerGameCommonOptions):
     checkout_income_multiplier: CheckoutIncomeMultiplier
     starting_cash: StartingCash
     free_customizables: FreeCustomizables
+    customer_checkout_locations: CustomerCheckoutLocations
+    customer_checkout_chance: CustomerCheckoutChance

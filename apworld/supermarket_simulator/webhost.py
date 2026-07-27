@@ -19,10 +19,13 @@ item_descriptions = {
 }
 
 location_descriptions = {
-    "Store Levels": "Checks triggered by reaching configured store level milestones.",
+    "Store Levels": "Checks triggered by reaching configured store level milestones (starting at Level 2).",
     "Days Completed": "Checks triggered by completing the configured number of operating days.",
     "Storage Upgrades": "Checks triggered by purchasing storage room upgrades (if enabled).",
+    "Section Upgrades": "Checks triggered by purchasing section room expansions (if enabled).",
     "Money Milestones": "Checks triggered by earning specific cumulative amounts of money (if enabled).",
+    "License Purchases": "Checks triggered by purchasing received product licenses at the store computer.",
+    "Customer Checkouts": "Checks triggered probabilistically when customers are checked out at registers.",
 }
 
 

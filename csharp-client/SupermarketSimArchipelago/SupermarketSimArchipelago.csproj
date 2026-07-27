@@ -1,13 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
 
-    <Version>0.2.1</Version>
-    <FileVersion>0.2.1</FileVersion>
-    <AssemblyVersion>0.2.1.0</AssemblyVersion>
+    <Version>0.2.2</Version>
+    <FileVersion>0.2.2</FileVersion>
+    <AssemblyVersion>0.2.2.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>

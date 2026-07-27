@@ -49,10 +49,13 @@ class SupermarketWorld(World):
     }
 
     location_name_groups = {
-        "Store Levels": {f"Store Level {i}" for i in range(1, 201)},
+        "Store Levels": {f"Store Level {i}" for i in range(2, 201)},
         "Days Completed": {f"Day {i} Completed" for i in range(1, 1001)},
         "Storage Upgrades": {f"Storage Room Upgrade {i}" for i in range(1, 21)},
-        "Money Milestones": {f"Earn {i}$" for i in range(1000, 500001, 1000)}
+        "Section Upgrades": {f"Section Room Upgrade {i}" for i in range(1, 33)},
+        "Money Milestones": {f"Earn {i}$" for i in range(1000, 500001, 1000)},
+        "License Purchases": {f"Purchase License {i}" for i in range(21, 71)},
+        "Customer Checkouts": {f"Customer Checkout {i}" for i in range(1, 101)}
     }
 
     def create_regions(self) -> None:
@@ -105,6 +108,38 @@ class SupermarketWorld(World):
                 if loc_name in location_table:
                     location = SupermarketLocation(self.player, loc_name, location_table[loc_name].id, main_region)
                     main_region.locations.append(location)
+
+        # 6. License Purchase Locations (Excludes starting licenses and excluded licenses)
+        starting_licenses = self.get_starting_items()
+        excluded_licenses = set(self.options.exclude_licenses.value)
+        active_dlcs = self.options.active_dlcs.value
+
+        for lic_name in self.item_name_groups["Licenses"]:
+            if lic_name in starting_licenses or lic_name in excluded_licenses:
+                continue
+
+            is_dlc = False
+            for dlc_key, dlc_items in dlc_licenses.items():
+                if lic_name in dlc_items:
+                    is_dlc = True
+                    if dlc_key in active_dlcs:
+                        lic_id = dlc_items[lic_name].id - 100
+                        loc_name = f"Purchase License {lic_id}"
+                        if loc_name in location_table:
+                            main_region.locations.append(SupermarketLocation(self.player, loc_name, location_table[loc_name].id, main_region))
+                    break
+            if not is_dlc:
+                lic_id = item_table[lic_name].id - 100
+                loc_name = f"Purchase License {lic_id}"
+                if loc_name in location_table:
+                    main_region.locations.append(SupermarketLocation(self.player, loc_name, location_table[loc_name].id, main_region))
+
+        # 7. Customer Checkout Locations
+        checkout_loc_count = self.options.customer_checkout_locations.value
+        for count in range(1, checkout_loc_count + 1):
+            loc_name = f"Customer Checkout {count}"
+            if loc_name in location_table:
+                main_region.locations.append(SupermarketLocation(self.player, loc_name, location_table[loc_name].id, main_region))
 
         # Victory event location (address=None marks it as a non-network event)
         victory_location = SupermarketLocation(self.player, "Victory", None, main_region)
@@ -348,5 +383,7 @@ class SupermarketWorld(World):
             "checkout_income_multiplier": self.options.checkout_income_multiplier.value,
             "starting_cash": self.options.starting_cash.value,
             "free_customizables": int(self.options.free_customizables.value),
+            "customer_checkout_locations": self.options.customer_checkout_locations.value,
+            "customer_checkout_chance": self.options.customer_checkout_chance.value,
             "seed": self.multiworld.seed_name,
         }

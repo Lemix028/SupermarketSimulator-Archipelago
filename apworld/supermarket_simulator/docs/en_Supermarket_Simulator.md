@@ -26,7 +26,7 @@ You can choose between three goals in your settings:
 
 ## What counts as a location check?
 
-Completing store days, reaching store level milestones, purchasing storage room upgrades, buying section expansions, and reaching money milestones (if enabled) all act as **checks** and send items to other players in the multiworld.
+Completing store days, reaching store level milestones (starting at Level 2), purchasing storage room upgrades, buying section expansions, purchasing received product licenses at the store computer (`Purchase License X`), completing customer checkouts (`Customer Checkout X`), and reaching money milestones (if enabled) all act as **checks** and send items to other players in the multiworld.
 
 ## What items can I receive?
 
@@ -52,6 +52,7 @@ If traps are enabled, you may receive the following negative events:
 You can configure several options in your settings to customize and balance your playthrough:
 
 - **Exclude Licenses:** Exclude specific product licenses by name from the "All Licenses" victory goal. These licenses will still be in the item pool as useful items but are not required for victory.
+- **Customer Checkout Locations & Chance:** Configure how many customer checkout checks exist in the multiworld (0–100, default 100) and the percentage chance per checked-out customer to trigger a check (1–100%, default 5%).
 - **Checkout Income Multiplier:** Multiply checkout payouts received at cash registers/self-checkouts (from 10% to 1000%).
 - **Starting Cash:** Customize how much money you start with in a new save game (from $10 to $10,000).
 - **Free Customizables:** Toggle to make all visual shop upgrades (wall paint, floor tiles, store rename, door placement, entrance variants) cost $0 since they do not affect progression.

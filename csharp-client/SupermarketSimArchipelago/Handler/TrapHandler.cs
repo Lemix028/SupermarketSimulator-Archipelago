@@ -234,7 +234,7 @@ namespace SupermarketArchipelago
                 if (manager == null)
                     return;
 
-                int crowdSize = UnityEngine.Random.RandomRangeInt(3, 6);
+                int crowdSize = UnityEngine.Random.RandomRangeInt(5, 10);
                 CustomerManager_Update_Patch.PendingShoplifterSpawns = crowdSize;
 
             }

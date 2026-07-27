@@ -30,10 +30,20 @@ namespace SupermarketSimArchipelago
         }
 
         [HarmonyPostfix]
-        public static void Postfix()
+        public static void Postfix(LicenseItem __instance)
         {
             StoreLevelBypassPatch.UseFakeLevel = false;
             GoalHandler.CheckLicensesGoal();
+
+            if (__instance != null)
+            {
+                int licenseID = __instance.LicenseID;
+                if (!ArchipelagoConfig.IsDefaultLicense(licenseID))
+                {
+                    int locationID = ArchipelagoIdHelper.FromLicensePurchase(licenseID);
+                    ArchipelagoClient.SendLocation(locationID);
+                }
+            }
         }
     }
 
@@ -203,6 +213,23 @@ namespace SupermarketSimArchipelago
         }
     }
 
-
-
+    [HarmonyPatch(typeof(LicensesTab), "OnEnable")]
+    public class LicensesTabOnEnablePatch
+    {
+        [HarmonyPostfix]
+        public static void Postfix(LicensesTab __instance)
+        {
+            if (__instance == null || __instance.m_LicenseItems == null) return;
+            foreach (var item in __instance.m_LicenseItems)
+            {
+                if (item != null)
+                    LicenseUiHelper.ForceArchipelagoVisuals(item);
+            }
+            try
+            {
+                __instance.ApplyFiltersAndSort();
+            }
+            catch { }
+        }
+    }
 }

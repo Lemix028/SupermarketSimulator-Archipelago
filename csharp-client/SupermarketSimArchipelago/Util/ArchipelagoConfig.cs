@@ -29,6 +29,8 @@ namespace SupermarketArchipelago
         public static HashSet<int> ExcludedLicenses { get; private set; } = new HashSet<int>();
         public static HashSet<int> RequiredLicenses { get; private set; } = new HashSet<int>();
 
+        public static bool IsDefaultLicense(int licenseId) => unlockedLicenses.Contains(licenseId);
+
         public static bool EnableMoneyMilestones { get; private set; } = true;
         public static int MaxMoneyMilestone { get; private set; } = 25000;
         public static int MoneyMilestoneInterval { get; private set; } = 5000;
@@ -38,6 +40,8 @@ namespace SupermarketArchipelago
         public static float CheckoutIncomeMultiplier { get; private set; } = 1.0f;
         public static float StartingCash { get; private set; } = 50.0f;
         public static bool FreeCustomizables { get; private set; } = false;
+        public static int CustomerCheckoutLocations { get; private set; } = 100;
+        public static int CustomerCheckoutChance { get; private set; } = 5;
 
         /// <summary>
         /// Parses the slot data dictionary received from the Archipelago server.
@@ -69,7 +73,7 @@ namespace SupermarketArchipelago
                 PriceRandomization = GetSafeInt(slotData, "price_randomization", 0);
                 Seed = GetSafeString(slotData, "seed", "");
 
-                int goalIndex = GetSafeInt(slotData, "goal", 0);
+                int goalIndex = GetSafeInt(slotData, "goal", 2);
                 if (goalIndex == 1)
                 {
                     GoalType = "Days";
@@ -95,6 +99,8 @@ namespace SupermarketArchipelago
                 CheckoutIncomeMultiplier = GetSafeInt(slotData, "checkout_income_multiplier", 100) / 100f;
                 StartingCash = GetSafeInt(slotData, "starting_cash", 50);
                 FreeCustomizables = GetSafeInt(slotData, "free_customizables", 0) == 1;
+                CustomerCheckoutLocations = GetSafeInt(slotData, "customer_checkout_locations", 100);
+                CustomerCheckoutChance = GetSafeInt(slotData, "customer_checkout_chance", 5);
 
                 Plugin.Log.LogInfo($"Applied Server Options!");
             }

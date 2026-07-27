@@ -6,9 +6,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.2.2] - Unreleased
+
+### APWorld (Python)
+
+#### Added
+- License Purchase Location Checks: Purchasing a received product license at the in-game computer now acts as a location check (`Purchase License X`). Starting licenses and excluded licenses do not generate purchase checks.
+- Customer Checkout Location Checks: Added `customer_checkout_locations` (0–100, default 100) and `customer_checkout_chance` (1–100%, default 5%) YAML options. Completing customer checkouts probabilistically triggers location checks.
+
+#### Changed
+- Default Victory Goal: Changed default goal in `options.py` to **`All Licenses`** (Goal 2).
+- Store Level 1 Excluded: Removed `Store Level 1` location check since players begin the game at Store Level 1.
+- Renamed all Python files in the APWorld to lowercase/snake_case (`items.py`, `locations.py`, `options.py`, `rules.py`, `license_data.py`).
+
+#### Fixed
+- Dynamic Purchase License Matching: Dynamically generated `Purchase License` location IDs from `item_table` to guarantee 100% ID alignment between Python APWorld and C# Client Mod.
+- Universal Tracker Crash (ZeroDivisionError): Populated `location_name_groups` with all location categories and corrected `Store Level` range starting at Level 2.
+
+### Client Mod (C# / BepInEx 6 IL2CPP)
+
+#### Added
+- License Purchase Location Handler: In-game computer license purchases automatically send `Purchase License X` location checks to the Archipelago server.
+- Customer Checkout Location Handler: Checking out customers at registers/self-checkouts probabilistically sends `Customer Checkout X` location checks based on server slot data options.
+- Inactive UI Object: Updated `UIHelper` refresh methods to include inactive UI components (`includeInactive = true`), updating received items even when computer tabs are currently closed.
+
+#### Fixed
+- Day Completed Offset Bug: Fixed `DayCompletedProgressPatch` sending `Day 2 Completed` on finishing Day 1 by correcting `__instance.CurrentDay - 1` calculation.
+- Price Overwriting Bug: Removed redundant UI price patches.
+
 ## [0.2.1] - 2026-07-19 — Initial Public Release
 
-### APWorld (Python / Archipelago Generator)
+### APWorld (Python)
 
 #### Added
 - Exclude Licenses Option: Added `exclude_licenses` setting to exclude specified product licenses by name in YAML from the "All Licenses" victory goal. Excluded licenses are dynamically categorized as `useful` items instead of `progression` items.
@@ -31,7 +59,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [0.2.0] - 2026-07-18 
 
-### APWorld (Python / Archipelago Generator)
+### APWorld (Python)
 
 #### Added
 - Initial public release of the Supermarket Simulator APWorld.

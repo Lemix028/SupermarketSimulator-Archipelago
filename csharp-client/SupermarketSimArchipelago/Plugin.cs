@@ -13,7 +13,7 @@ namespace SupermarketArchipelago
     {
         public const string PLUGIN_GUID = "com.lemix028.supermarketsimulator.archipelago";
         public const string PLUGIN_NAME = "Supermarket Simulator Archipelago";
-        public const string PLUGIN_VERSION = "0.2.1"; 
+        public const string PLUGIN_VERSION = "0.2.2"; 
     }
 
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]

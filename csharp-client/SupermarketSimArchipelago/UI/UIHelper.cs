@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using SupermarketSimArchipelago;
 using System;
 using System.Collections.Generic;
@@ -18,26 +18,30 @@ namespace SupermarketArchipelago
         /// </summary>
         public static void RefreshLicenseUI(int licenseID)
         {
-            var tab = GameObject.FindObjectOfType<LicensesTab>();
-            if (tab == null) return;
-
-            foreach (var item in tab.m_LicenseItems)
+            var licenseItems = GameObject.FindObjectsOfType<LicenseItem>(true);
+            if (licenseItems != null)
             {
-                if (item.m_licenseID == licenseID)
+                foreach (var item in licenseItems)
                 {
-                    // Set active status and level requirements
-                    item.OnLicenseActivatedExternally(licenseID, true);
-                    item.CheckIfReachedRequiredLevel(true);
-                    item.RefreshFromState();
-
-                    // Restore localization and enable purchase interaction
-                    RefreshLocalization(item.m_PurchaseButtonText);
-                    if (item.m_PurchaseButton != null) item.m_PurchaseButton.interactable = true;
-
-                    break;
+                    if (item != null && item.m_licenseID == licenseID)
+                    {
+                        LicenseUiHelper.ForceArchipelagoVisuals(item);
+                        item.OnLicenseActivatedExternally(licenseID, true);
+                        item.CheckIfReachedRequiredLevel(true);
+                        item.RefreshFromState();
+                    }
                 }
             }
-            tab.ApplyFiltersAndSort();
+
+            var tab = GameObject.FindObjectOfType<LicensesTab>(true);
+            if (tab != null)
+            {
+                try
+                {
+                    tab.ApplyFiltersAndSort();
+                }
+                catch { }
+            }
         }
 
         /// <summary>
@@ -69,7 +73,7 @@ namespace SupermarketArchipelago
         /// </summary>
         public static void RefreshFurnitureUI(int gameFurnitureID)
         {
-            var items = GameObject.FindObjectsOfType<FurnitureSalesItem>();
+            var items = GameObject.FindObjectsOfType<FurnitureSalesItem>(true);
             if (items == null) return;
 
             foreach (var item in items)
@@ -87,7 +91,7 @@ namespace SupermarketArchipelago
         /// </summary>
         public static void RefreshVehicleUI(int gameVehicleID)
         {
-            var items = GameObject.FindObjectsOfType<VehicleSaleItem>();
+            var items = GameObject.FindObjectsOfType<VehicleSaleItem>(true);
             if (items == null) return;
 
             foreach (var item in items)
@@ -106,7 +110,7 @@ namespace SupermarketArchipelago
         public static void RefreshStorageUI()
         {
 
-                var storageItems = GameObject.FindObjectsOfType<StorageSectionItem>();
+                var storageItems = GameObject.FindObjectsOfType<StorageSectionItem>(true);
                 if (storageItems == null) return;
 
                 foreach (var item in storageItems)
@@ -126,7 +130,7 @@ namespace SupermarketArchipelago
         {
             try
             {
-                var loanItems = GameObject.FindObjectsOfType<LoanItem>();
+                var loanItems = GameObject.FindObjectsOfType<LoanItem>(true);
                 if (loanItems == null) return;
 
                 foreach (var item in loanItems)

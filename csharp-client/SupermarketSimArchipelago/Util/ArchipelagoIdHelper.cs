@@ -32,6 +32,8 @@ namespace SupermarketArchipelago
         StorageUpgrade,
         SectionUpgrade,
         MoneyMilestone,
+        LicensePurchase,
+        CustomerCheckout,
         Unknown
     }
 
@@ -62,6 +64,8 @@ namespace SupermarketArchipelago
         public const int StorageUpgradeLocationBaseID = 220000;
         public const int SectionUpgradeLocationBaseID = 225000;
         public const int MoneyMilestoneBaseID = 230000;
+        public const int LicensePurchaseLocationBaseID = 240000;
+        public const int CustomerCheckoutLocationBaseID = 250000;
 
         private static readonly Dictionary<int, int> ApToGameFurniture = new Dictionary<int, int>
         {
@@ -204,6 +208,8 @@ namespace SupermarketArchipelago
             if (locationID > StorageUpgradeLocationBaseID && locationID <= StorageUpgradeLocationBaseID + 20) return ApLocationType.StorageUpgrade;
             if (locationID > SectionUpgradeLocationBaseID && locationID <= SectionUpgradeLocationBaseID + 32) return ApLocationType.SectionUpgrade;
             if (locationID > MoneyMilestoneBaseID && locationID <= MoneyMilestoneBaseID + 500) return ApLocationType.MoneyMilestone;
+            if (locationID > LicensePurchaseLocationBaseID && locationID <= LicensePurchaseLocationBaseID + 100) return ApLocationType.LicensePurchase;
+            if (locationID > CustomerCheckoutLocationBaseID && locationID <= CustomerCheckoutLocationBaseID + 200) return ApLocationType.CustomerCheckout;
             return ApLocationType.Unknown;
         }
 
@@ -212,5 +218,7 @@ namespace SupermarketArchipelago
         public static int FromStorageUpgrade(int upgrade) => StorageUpgradeLocationBaseID + upgrade;
         public static int FromSectionUpgrade(int upgrade) => SectionUpgradeLocationBaseID + upgrade;
         public static int FromMoneyMilestone(int money) => MoneyMilestoneBaseID + (money / 1000);
+        public static int FromLicensePurchase(int licenseId) => LicensePurchaseLocationBaseID + licenseId;
+        public static int FromCustomerCheckout(int count) => CustomerCheckoutLocationBaseID + count;
     }
 }
