@@ -155,7 +155,6 @@ namespace SupermarketArchipelago
             }
             else
             {
-                if (item.m_PurchaseButton != null) item.m_PurchaseButton.interactable = true;
 
                 if (btnLoc != null)
                 {
