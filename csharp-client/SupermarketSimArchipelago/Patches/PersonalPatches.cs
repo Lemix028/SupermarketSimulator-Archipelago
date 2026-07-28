@@ -8,100 +8,42 @@ using UnityEngine.Localization.Components;
 namespace SupermarketArchipelago
 {
     // ==========================================
-    // UI ROOT INTERCEPTOR
-    // ==========================================
-    [HarmonyPatch(typeof(UnityEngine.UI.Selectable), nameof(UnityEngine.UI.Selectable.interactable), MethodType.Setter)]
-    public class SelectableInteractablePatch
-    {
-        public static void Prefix(UnityEngine.UI.Selectable __instance, ref bool __0)
-        {
-            if (__instance == null) return;
-
-            if (IsStaffButton(__instance, out bool hasItem, out bool isHired, out bool isBaker))
-            {
-                if (hasItem && !isHired)
-                {
-                    if (!isBaker)
-                    {
-                        __0 = true;
-                    }
-                }
-                else if (!hasItem)
-                {
-                    __0 = false; 
-                }
-            }
-        }
-
-        private static bool IsStaffButton(UnityEngine.UI.Selectable sel, out bool hasItem, out bool isHired, out bool isBaker)
-        {
-            hasItem = false; isHired = false; isBaker = false;
-
-            var c = sel.GetComponentInParent<CashierItem>();
-            if (c != null && sel == c.m_HireButton) { hasItem = c.CashierId <= ArchipelagoClient.GetReceivedCashierCount(); isHired = c.Hired; return true; }
-
-            var j = sel.GetComponentInParent<JanitorItem>();
-            if (j != null && sel == j.m_HireButton) { hasItem = j.JanitorId <= ArchipelagoClient.GetReceivedJanitorCount(); isHired = j.Hired; return true; }
-
-            var r = sel.GetComponentInParent<RestockerItem>();
-            if (r != null && sel == r.m_HireButton) { hasItem = r.RestockerId <= ArchipelagoClient.GetReceivedRestockerCount(); isHired = r.Hired; return true; }
-
-            var s = sel.GetComponentInParent<SecurityGuardItem>();
-            if (s != null && sel == s.m_HireButton) { hasItem = s.HelperId <= ArchipelagoClient.GetReceivedSecurityCount(); isHired = s.Hired; return true; }
-
-            var h = sel.GetComponentInParent<CustomerHelperItem>();
-            if (h != null && sel == h.m_HireButton) { hasItem = h.HelperId <= ArchipelagoClient.GetReceivedHelperCount(); isHired = h.Hired; return true; }
-
-            var ic = sel.GetComponentInParent<IceCreamHelperItem>();
-            if (ic != null && sel == ic.m_HireButton) { hasItem = ic.ID <= ArchipelagoClient.GetReceivedIceCreamHelperCount(); isHired = ic.Hired; return true; }
-
-            var b = sel.GetComponentInParent<BakerItem>();
-            if (b != null && sel == b.m_HireButton)
-            {
-                hasItem = b.BakerId <= ArchipelagoClient.GetReceivedBakerCount();
-                isHired = b.Hired;
-                isBaker = true;
-                return true;
-            }
-
-            return false;
-        }
-    }
-
-    // ==========================================
     // CENTRAL UI MANAGER AND REFRESH MECHANISM
     // ==========================================
     public static class PersonalUiManager
     {
         public static void RefreshPersonalUI()
         {
+
+            foreach (var item in UnityEngine.Object.FindObjectsOfType<CashierItem>())
+                RefreshItem(item, value => value.UpdateRequiredStoreLevel(true));
+            foreach (var item in UnityEngine.Object.FindObjectsOfType<JanitorItem>())
+                RefreshItem(item, value => value.UpdateRequiredStoreLevel(true));
+            foreach (var item in UnityEngine.Object.FindObjectsOfType<RestockerItem>())
+                RefreshItem(item, value => value.UpdateRequiredStoreLevel(true));
+            foreach (var item in UnityEngine.Object.FindObjectsOfType<SecurityGuardItem>())
+                RefreshItem(item, value => value.UpdateRequiredStoreLevel(true));
+            foreach (var item in UnityEngine.Object.FindObjectsOfType<CustomerHelperItem>())
+                RefreshItem(item, value => value.UpdateRequiredStoreLevel(true));
+            foreach (var item in UnityEngine.Object.FindObjectsOfType<IceCreamHelperItem>())
+                RefreshItem(item, value => value.UpdateRequiredStoreLevel(true));
+
+            var bakerSetupMethod = AccessTools.Method(typeof(BakerItem), "Setup");
+            foreach (var item in UnityEngine.Object.FindObjectsOfType<BakerItem>())
+                RefreshItem(item, value => bakerSetupMethod?.Invoke(value, null));
+        }
+
+        private static void RefreshItem<T>(T item, Action<T> refresh) where T : UnityEngine.Object
+        {
+            if (item == null) return;
+
             try
             {
-                foreach (var item in UnityEngine.Object.FindObjectsOfType<CashierItem>())
-                    item.UpdateRequiredStoreLevel(true);
-
-                foreach (var item in UnityEngine.Object.FindObjectsOfType<JanitorItem>())
-                    item.UpdateRequiredStoreLevel(true);
-
-                foreach (var item in UnityEngine.Object.FindObjectsOfType<RestockerItem>())
-                    item.UpdateRequiredStoreLevel(true);
-
-                foreach (var item in UnityEngine.Object.FindObjectsOfType<SecurityGuardItem>())
-                    item.UpdateRequiredStoreLevel(true);
-
-                foreach (var item in UnityEngine.Object.FindObjectsOfType<CustomerHelperItem>())
-                    item.UpdateRequiredStoreLevel(true);
-
-                foreach (var item in UnityEngine.Object.FindObjectsOfType<IceCreamHelperItem>())
-                    item.UpdateRequiredStoreLevel(true);
-                var bakerSetupMethod = AccessTools.Method(typeof(BakerItem), "Setup");
-                foreach (var item in UnityEngine.Object.FindObjectsOfType<BakerItem>())
-                {
-                    bakerSetupMethod?.Invoke(item, null);
-                }
+                refresh(item);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Plugin.Log.LogWarning($"Failed to refresh hiring UI for {typeof(T).Name}: {ex.Message}");
             }
         }
 
@@ -134,10 +76,22 @@ namespace SupermarketArchipelago
             }
             else
             {
-                if (btnLoc != null) { btnLoc.enabled = true; btnLoc.RefreshString(); }
+                if (btnLoc != null)
+                {
+                    btnLoc.enabled = true;
+                    btnLoc.RefreshString();
+                }
+                if (btnText != null && btnText.text == "Locked") btnText.text = "Hire";
                 if (reqLevelText != null) { reqLevelText.gameObject.SetActive(true); reqLevelText.text = "Item unlocked"; reqLevelText.color = compColor; }
             }
         }
+    }
+
+    [HarmonyPatch(typeof(HiringTab), "OnEnable")]
+    public class HiringTabOnEnablePatch
+    {
+        [HarmonyPostfix]
+        public static void Postfix() => PersonalUiManager.RefreshPersonalUI();
     }
 
     // ==========================================
@@ -147,12 +101,35 @@ namespace SupermarketArchipelago
     [HarmonyPatch(typeof(CashierItem))]
     public class CashierPatches
     {
+        private static void ApplyArchipelagoRequirements(CashierItem item)
+        {
+            if (item == null) return;
+
+            bool hasItem = item.CashierId <= ArchipelagoClient.GetReceivedCashierCount();
+            item.m_HireLocked = !hasItem;
+            if (!hasItem) return;
+            if (item.m_CashierSetup == null) return;
+
+            item.m_CashierSetup.RequiredStoreLevel = 0;
+            item.m_CashierSetup.CheckoutGoalToUnlock = 0;
+        }
+
+        [HarmonyPatch(nameof(CashierItem.CanHire))]
+        [HarmonyPrefix]
+        public static void CanHirePrefix(CashierItem __instance) => ApplyArchipelagoRequirements(__instance);
+
         [HarmonyPatch(nameof(CashierItem.CanHire))]
         [HarmonyPostfix]
         public static void CanHirePostfix(CashierItem __instance, ref bool __result)
         {
-            if (__instance.CashierId <= ArchipelagoClient.GetReceivedCashierCount() && !__instance.Hired) __result = true;
+            __result = __result
+                && __instance.CashierId <= ArchipelagoClient.GetReceivedCashierCount()
+                && !__instance.Hired;
         }
+
+        [HarmonyPatch("UpdateRequiredStoreLevel", new Type[] { typeof(bool) })]
+        [HarmonyPrefix]
+        public static void UiPrefix(CashierItem __instance) => ApplyArchipelagoRequirements(__instance);
 
         [HarmonyPatch("UpdateRequiredStoreLevel", new Type[] { typeof(bool) })]
         [HarmonyPostfix]
@@ -161,11 +138,6 @@ namespace SupermarketArchipelago
             bool hasItem = __instance.CashierId <= ArchipelagoClient.GetReceivedCashierCount();
             __instance.m_HireLocked = !hasItem;
 
-            if (hasItem && __instance.m_CashierSetup != null)
-            {
-                __instance.m_CashierSetup.RequiredStoreLevel = 0;
-                __instance.m_CashierSetup.CheckoutGoalToUnlock = 0;
-            }
             PersonalUiManager.ApplyStaffUi(hasItem, __instance.Hired, __instance.m_HireButton, __instance.m_RequiredStoreLevelText, __instance.m_LocalizedRequiredStoreLevelText, __instance.m_IncompletedRequirementColor, __instance.m_CompletedRequirementColor, __instance.m_CheckoutObjectiveText != null ? __instance.m_CheckoutObjectiveText.gameObject : null);
         }
     }
@@ -186,7 +158,6 @@ namespace SupermarketArchipelago
         {
             bool hasItem = __instance.JanitorId <= ArchipelagoClient.GetReceivedJanitorCount();
             __instance.m_HireLocked = !hasItem;
-            __instance.m_JanitorSetup.RequiredStoreLevel = 0;
 
             if (hasItem && __instance.m_JanitorSetup != null)
             {
@@ -200,12 +171,35 @@ namespace SupermarketArchipelago
     [HarmonyPatch(typeof(RestockerItem))]
     public class RestockerPatches
     {
+        private static void ApplyArchipelagoRequirements(RestockerItem item)
+        {
+            if (item == null) return;
+
+            bool hasItem = item.RestockerId <= ArchipelagoClient.GetReceivedRestockerCount();
+            item.m_HireLocked = !hasItem;
+            if (!hasItem) return;
+            if (item.m_RestockerSetup == null) return;
+
+            item.m_RestockerSetup.RequiredStoreLevel = 0;
+            item.m_RestockerSetup.RackGoalToUnlock = 0;
+        }
+
+        [HarmonyPatch("CanHire")]
+        [HarmonyPrefix]
+        public static void CanHirePrefix(RestockerItem __instance) => ApplyArchipelagoRequirements(__instance);
+
         [HarmonyPatch("CanHire")]
         [HarmonyPostfix]
         public static void CanHirePostfix(RestockerItem __instance, ref bool __result)
         {
-            if (__instance.RestockerId <= ArchipelagoClient.GetReceivedRestockerCount() && !__instance.Hired) __result = true;
+            __result = __result
+                && __instance.RestockerId <= ArchipelagoClient.GetReceivedRestockerCount()
+                && !__instance.Hired;
         }
+
+        [HarmonyPatch("UpdateRequiredStoreLevel", new Type[] { typeof(bool) })]
+        [HarmonyPrefix]
+        public static void UiPrefix(RestockerItem __instance) => ApplyArchipelagoRequirements(__instance);
 
         [HarmonyPatch("UpdateRequiredStoreLevel", new Type[] { typeof(bool) })]
         [HarmonyPostfix]
@@ -214,13 +208,7 @@ namespace SupermarketArchipelago
             bool hasItem = __instance.RestockerId <= ArchipelagoClient.GetReceivedRestockerCount();
             __instance.m_HireLocked = !hasItem;
 
-            if (hasItem && __instance.m_RestockerSetup != null)
-            {
-                __instance.m_RestockerSetup.RequiredStoreLevel = 0;
-                __instance.m_RestockerSetup.RackGoalToUnlock = 0;
-
-            }
-            PersonalUiManager.ApplyStaffUi(hasItem, __instance.Hired, __instance.m_HireButton, __instance.m_RequiredStoreLevelText, __instance.m_LocalizedRequiredStoreLevelText, __instance.m_IncompletedRequirementColor, __instance.m_CompletedRequirementColor, __instance.m_StorageObjectiveText != null ? __instance.m_StorageObjectiveText.gameObject : null, __instance.m_RackObjectiveText != null ? __instance.m_RackObjectiveText.gameObject : null, __instance.m_StorageObjectiveText, __instance.m_LocalizedStorageObjectiveText);
+            PersonalUiManager.ApplyStaffUi(hasItem, __instance.Hired, __instance.m_HireButton, __instance.m_RequiredStoreLevelText, __instance.m_LocalizedRequiredStoreLevelText, __instance.m_IncompletedRequirementColor, __instance.m_CompletedRequirementColor, __instance.m_RackObjectiveText != null ? __instance.m_RackObjectiveText.gameObject : null);
         }
     }
 
