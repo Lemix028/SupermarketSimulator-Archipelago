@@ -155,7 +155,7 @@ namespace SupermarketSimArchipelago
             if (item == null) return;
             if (item.m_IsPurchased == true) return;
             bool hasItem = ArchipelagoClient.CheckIncomingLicense(item.LicenseID);
-            
+
             if (item.m_RequiredLevelLocalizedText != null)
             {
                 item.m_RequiredLevelLocalizedText.OnUpdateString.RemoveAllListeners();
@@ -176,7 +176,7 @@ namespace SupermarketSimArchipelago
                 }
             } else
             {
-
+                RestorePurchaseButtonText(item);
 
                 if (item.m_RequiredLevelText != null)
                 {
@@ -185,6 +185,20 @@ namespace SupermarketSimArchipelago
                     item.m_ReachedRequiredStoreLevelColor = Color.green; // Set color to green to be absolutely clear
                     item.m_RequiredLevelText.color = item.m_ReachedRequiredStoreLevelColor;
                 }
+            }
+        }
+
+        private static void RestorePurchaseButtonText(LicenseItem item)
+        {
+            if (item?.m_PurchaseButtonText == null) return;
+
+            UIHelper.RefreshLocalization(item.m_PurchaseButtonText);
+
+            // Localization can update on a later frame. Do not leave the
+            // Archipelago override visible while the license is already usable.
+            if (string.Equals(item.m_PurchaseButtonText.text, "Locked", StringComparison.OrdinalIgnoreCase))
+            {
+                item.m_PurchaseButtonText.text = "Buy";
             }
         }
     }
