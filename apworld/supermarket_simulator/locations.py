@@ -41,6 +41,6 @@ for lic_name, item_data in item_table.items():
         lic_id = item_data.id - 100
         location_table[f"Purchase {lic_name}"] = LocationData(LICENSE_PURCHASE_BASE_ID + lic_id)
 
-# Pre-generate Customer Checkout locations (1 to 100)
-for count in range(1, 101):
+# Pre-generate Customer Checkout locations (1 to 10000)
+for count in range(1, 10001):
     location_table[f"Customer Checkout {count}"] = LocationData(CUSTOMER_CHECKOUT_BASE_ID + count)

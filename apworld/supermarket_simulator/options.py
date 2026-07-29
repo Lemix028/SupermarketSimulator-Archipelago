@@ -6,7 +6,8 @@ from .license_data import LICENSE_DETAILS
 class ActiveDLCs(OptionSet):
     """Select which DLCs are active. 
     Enabling a DLC dynamically injects its licenses and items into the item pool.
-    Options: dlc_ice_cream, dlc_bakery, dlc_vending, dlc_essentials, dlc_hardware, dlc_electronics, dlc_clothing"""
+    Options: dlc_ice_cream, dlc_bakery, dlc_vending, dlc_essentials, dlc_hardware, dlc_electronics, dlc_clothing
+    Recommended: Enable all DLCs (only if you own them)."""
     display_name = "Active DLCs"
     valid_keys = {
         "dlc_ice_cream",
@@ -23,7 +24,8 @@ class Goal(Choice):
     """The victory condition for your Archipelago round.
     Level: Reach the configured maximum store level.
     Days: Complete the configured maximum number of operating days.
-    All Licenses: Collect every product license in the item pool (base game + active DLCs)."""
+    All Licenses: Collect every product license in the item pool (base game + active DLCs).
+    Recommended: All Licenses."""
     display_name = "Goal"
     option_level = 0
     option_days = 1
@@ -31,10 +33,11 @@ class Goal(Choice):
     default = 2
 
 class PriceRandomization(Choice):
-    """Randomizes the prices of items in the store. This affects the price you pay for items.
+    """Randomizes the prices of items in the store. This affects the price you pay for items, not the selling price of your products!.
     Disabled: Standard prices.
     Balanced: Prices vary by up to +/- 20%.
-    Chaotic: Prices vary by up to +/- 50%. Margins remain stable."""
+    Chaotic: Prices vary by up to +/- 50%. Margins remain stable.
+    Recommended: Balanced."""
     display_name = "Price Randomization"
     option_disabled = 0
     option_balanced = 1
@@ -42,59 +45,71 @@ class PriceRandomization(Choice):
     default = 0
 
 class MaxStoreLevel(Range):
-    """The maximum store level that will contain locations (checks)."""
+    """The maximum store level that will contain locations (checks).
+       Recommended: Depends how long you want to play."""
     display_name = "Max Store Level"
     range_start = 5
-    range_end = 200
+    range_end = 100
     default = 50
 
 class StoreLevelInterval(Range):
-    """How many levels should be between individual checks. E.g., 2 means Level 2, 4, 6..."""
+    """How many levels should be between individual checks. E.g., 2 means Level 2, 4, 6...
+       Recommended: 1"""
     display_name = "Store Level Interval"
     range_start = 1
     range_end = 10
     default = 1
 
 class MaxDaysCompleted(Range):
-    """The maximum number of completed days that contain checks."""
+    """The maximum number of completed days that contain checks.
+        Recommended: Depends how long you want to play."""
     display_name = "Max Days Completed"
     range_start = 5
     range_end = 1000
     default = 100
 
 class DaysCompletedInterval(Range):
-    """How many completed days should be between checks. E.g., 5 means Day 5, 10, 15..."""
+    """How many completed days should be between checks. E.g., 5 means Day 5, 10, 15...
+       Recommended: 1"""
     display_name = "Days Completed Interval"
     range_start = 1
     range_end = 20
     default = 1
 
 class EnableSectionLocations(DefaultOnToggle):
-    """If enabled, buy section room locations can be generated."""
+    """If enabled, buy section room locations can be generated.
+    Recommended: Enabled."""
     display_name = "Enable Section Locations"
 
 class EnableFurnitureLocks(DefaultOnToggle):
     """If enabled, furniture (fridges, shelves) is locked behind AP items.
-    If disabled, they are immediately available and removed from the item pool."""
+    If disabled, they are immediately available and removed from the item pool.
+    Recommended: Enabled."""
     display_name = "Enable Furniture Locks"
 
 class EnableVehicleLocks(DefaultOnToggle):
     """If enabled, vehicles are locked behind AP items.
-    If disabled, they are immediately available."""
+    If disabled, they are immediately available.
+    Recommended: Enabled."""
     display_name = "Enable Vehicle Locks"
 
 class EnableStorageLocks(DefaultOnToggle):
-    """If enabled, storage room upgrades are locked behind AP items and also act as checks."""
+    """If enabled, storage room upgrades are locked behind AP items and also act as checks.
+    If disabled, they are immediately available and removed from the item pool.
+    Recommended: Enabled."""
     display_name = "Enable Storage Locks"
 
 class EnableLoanLocks(DefaultOnToggle):
-    """If enabled, credit line licenses (1-6) are locked behind AP items."""
+    """If enabled, credit line licenses (1-6) are locked behind AP items.
+    If disabled, they are immediately available and removed from the item pool.
+    Recommended: Enabled."""
     display_name = "Enable Loan Locks"
 
 # === STARTING ITEMS CONFIGURATIONS ===
 
 class StartingLicenses(OptionList):
-    """List of product licenses you want to start the game with (e.g., 'License 21'). License 21 needs to be included currently because the game sets it as a starting license."""
+    """List of product licenses you want to start the game with (e.g., 'License 21'). License 21 needs to be included currently because the game sets it as a starting license.
+    Recommended: Default except if you want to start with more licenses."""
     display_name = "Starting Licenses"
     default = ["License 21"]
 
@@ -105,7 +120,8 @@ class StartingLicenses(OptionList):
         super().verify(world, player_name, plando_options)
 
 class StartingVehicles(OptionList):
-    """List of vehicles you want to start the game with (e.g., 'Skateboard')."""
+    """List of vehicles you want to start the game with (e.g., 'Skateboard').
+       Recommended: None except if you want to start easy."""
     display_name = "Starting Vehicles"
     default = []
 
@@ -118,7 +134,8 @@ class StartingVehicles(OptionList):
 class StartingFurniture(OptionList):
     """List of furniture items you want to start the game with.
        Default game starts with two normal shelves and a checkout counter.
-       Some DLCs furniture listed here may not be available if the DLC is not enabled."""
+       Some DLCs furniture listed here may not be available if the DLC is not enabled.
+       Recommended: None except you like to have basic furniture to begin like half shelf and mini fridge."""
     display_name = "Starting Furniture"
     default = []
 
@@ -131,18 +148,21 @@ class StartingFurniture(OptionList):
 # === TRAPS & FILLERS ===
 
 class EnableTraps(DefaultOnToggle):
-    """If enabled, harmful trap items can be generated as fillers."""
+    """If enabled, harmful trap items can be generated as fillers.
+    Recommended: Enabled unless you want a more peaceful experience."""
     display_name = "Enable Traps"
 
 class TrapFrequency(Range):
-    """The percentage chance (0-100) that a filler item becomes a trap instead of a booster."""
+    """The percentage chance (0-100) that a filler item becomes a trap instead of a booster.
+        Recommended: 20"""
     display_name = "Trap Frequency"
     range_start = 0
     range_end = 100
     default = 20
 
 class DisabledTraps(OptionList):
-    """List of traps that should be excluded from generation."""
+    """List of traps that should be excluded from generation.
+    Recommended: None unless you want to avoid specific traps."""
     display_name = "Disabled Traps"
     default = []
 
@@ -153,36 +173,42 @@ class DisabledTraps(OptionList):
         super().verify(world, player_name, plando_options)
 
 class FillerMoneyWeight(Range):
-    """Generation weight for money boosters."""
+    """Generation weight for money boosters.
+    Recommended: 50"""
     display_name = "Filler Money Weight"
     range_start = 0
     range_end = 100
     default = 50
 
 class FillerXPWeight(Range):
-    """Generation weight for store XP boosters."""
+    """Generation weight for store XP boosters.
+    Recommended: 50"""
     display_name = "Filler XP Weight"
     range_start = 0
     range_end = 100
     default = 50
 
 class EnableBlackfridayEvents(DefaultOnToggle):
-    """If enabled, Blackfriday events can be generated as fillers."""
+    """If enabled, Blackfriday events can be generated as fillers.
+    Recommended: Enabled"""
     display_name = "Enable Blackfriday Events"
 
 class FillerBlackfridayWeight(Range):
-    """Generation weight for Blackfriday events."""
+    """Generation weight for Blackfriday events.
+    Recommended: 10"""
     display_name = "Filler Blackfriday Weight"
     range_start = 0
     range_end = 100
     default = 10
 
 class EnableMoneyMilestones(DefaultOnToggle):
-    """If enabled, reaching specific money milestones unlocks Archipelago checks."""
+    """If enabled, reaching specific money milestones unlocks Archipelago checks. You must hold this amount of money, not just earn it total.
+    Recommended: Enabled"""
     display_name = "Enable Money Milestones"
 
 class MaxMoneyMilestone(Range):
-    """The maximum amount of money that includes checks."""
+    """The maximum amount of money that includes checks.
+    Recommended: 25000 because the game is designed to use your money to unlock checks and progress. Setting this too high can make the checks difficult to achieve."""
     display_name = "Max Money Milestone"
     range_start = 5000
     range_end = 500000
@@ -190,7 +216,8 @@ class MaxMoneyMilestone(Range):
     step = 5000
 
 class MoneyMilestoneInterval(Range):
-    """The interval between money checks (e.g., every $5000)."""
+    """The interval between money checks (e.g., every $5000).
+    Recommended: 2000-5000"""
     display_name = "Money Milestone Interval"
     range_start = 1000
     range_end = 100000
@@ -200,7 +227,8 @@ class MoneyMilestoneInterval(Range):
 class VendingMachineSlots(Range):
     """The number of Vending Machine Slot licenses placed in the item pool.
     Each item allows buying an additional vending machine slot in the computer.
-    dlc_vending must be enabled for this option to have any effect."""
+    dlc_vending must be enabled for this option to have any effect.
+    Recommended: Set it to the number of vending machine slots you want to be able to buy in the game."""
     display_name = "Vending Machine Slots"
     range_start = 0
     range_end = 20
@@ -208,14 +236,16 @@ class VendingMachineSlots(Range):
 
 class ExcludeLicenses(OptionSet):
     """List of product licenses to exclude from the 'All Licenses' victory goal.
-    These licenses will still be in the item pool and function normally, but they will not be required to be collected or bought to win the game."""
+    These licenses will still be in the item pool and function normally, but they will not be required to be collected or bought to win the game.
+    Recommended: None unless you want make the game quicker or easier by excluding some licenses from the goal."""
     display_name = "Exclude Licenses"
     valid_keys = set(ALL_LICENSES)
     default = set()
 
 class CheckoutIncomeMultiplier(Range):
     """Multiplies the payout received at the cash register/self-checkout when customers pay.
-    Represented in percentage (100 = 1.0x, 120 = 1.2x, 80 = 0.8x)."""
+    Represented in percentage (100 = 1.0x, 120 = 1.2x, 80 = 0.8x).
+    Recommended: 100 (1.0x) but you can increase it to make the game easier or decrease it to make the game harder."""
     display_name = "Checkout Income Multiplier"
     range_start = 10
     range_end = 1000
@@ -223,28 +253,32 @@ class CheckoutIncomeMultiplier(Range):
 
 
 class StartingCash(Range):
-    """The cash the player starts with in a new game. Default game starts with $50."""
+    """The cash the player starts with in a new game. Default game starts with $50.
+    Recommended: 50 (Game default) but you can increase it to make the game easier."""
     display_name = "Starting Cash"
-    range_start = 10
+    range_start = 25
     range_end = 10000
     default = 50
 
 
 class FreeCustomizables(Toggle):
     """If enabled, all store customization options (wall paint, floor tiles, store rename, door placement, entrance variants) cost $0.
-       Since these are normally cosmetic-only, this option does not affect the game balance."""
+       Since these are normally cosmetic-only, this option does not affect the game balance.
+       Recommended: Your preference, but it can make the game more fun to customize your store without worrying about money."""
     display_name = "Free Customizables"
-    default = 0
+    default = 1
 
 class CustomerCheckoutLocations(Range):
-    """Number of Customer Checkout location checks generated in the multiworld."""
+    """Number of Customer Checkout location checks generated in the multiworld. Every time a customer checks out, there is a chance to trigger a check at one of these locations.
+    Recommended: Your preference, but having some checks is recommended."""
     display_name = "Customer Checkout Locations"
     range_start = 0
-    range_end = 100
+    range_end = 10000
     default = 100
 
 class CustomerCheckoutChance(Range):
-    """Percentage chance (1-100%) per checked-out customer to trigger a Customer Checkout location check."""
+    """Percentage chance (1-100%) per checked-out customer to trigger a Customer Checkout location check.
+    Recommended: Depends on how many Customer Checkout locations you have and how long your run goes."""
     display_name = "Customer Checkout Chance"
     range_start = 1
     range_end = 100

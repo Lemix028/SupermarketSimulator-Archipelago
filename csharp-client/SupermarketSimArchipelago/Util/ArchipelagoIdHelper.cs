@@ -209,7 +209,7 @@ namespace SupermarketArchipelago
             if (locationID > SectionUpgradeLocationBaseID && locationID <= SectionUpgradeLocationBaseID + 32) return ApLocationType.SectionUpgrade;
             if (locationID > MoneyMilestoneBaseID && locationID <= MoneyMilestoneBaseID + 500) return ApLocationType.MoneyMilestone;
             if (locationID > LicensePurchaseLocationBaseID && locationID <= LicensePurchaseLocationBaseID + 100) return ApLocationType.LicensePurchase;
-            if (locationID > CustomerCheckoutLocationBaseID && locationID <= CustomerCheckoutLocationBaseID + 200) return ApLocationType.CustomerCheckout;
+            if (locationID > CustomerCheckoutLocationBaseID && locationID <= CustomerCheckoutLocationBaseID + 10000) return ApLocationType.CustomerCheckout;
             return ApLocationType.Unknown;
         }
 
