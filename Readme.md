@@ -5,7 +5,7 @@
 [![Game Version](https://img.shields.io/badge/Game%20Version-1.5.2-blue.svg)](https://store.steampowered.com/app/2670630/Supermarket_Simulator/)
 [![Framework](https://img.shields.io/badge/Framework-BepInEx%206%20(IL2CPP)-orange.svg)](https://github.com/BepInEx/BepInEx)
 
-[Troubleshooting](TROUBLESHOOTING.md) | [Report a Bug](https://github.com/Lemix028/SupermarketSimulator-Archipelago/issues)
+[Troubleshooting FAQ](Troubleshooting.md) | [Report a Bug](https://github.com/Lemix028/SupermarketSimulator-Archipelago/issues)
 
 ---
 
