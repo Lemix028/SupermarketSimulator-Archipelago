@@ -12,16 +12,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 #### Added
 - License Purchase Location Checks: Purchasing a received product license at the in-game computer now acts as a location check (`Purchase License X`). Starting licenses and excluded licenses do not generate purchase checks.
-- Customer Checkout Location Checks: Added `customer_checkout_locations` (0–100, default 100) and `customer_checkout_chance` (1–100%, default 5%) YAML options. Completing customer checkouts probabilistically triggers location checks.
+- Customer Checkout Location Checks: Added `customer_checkout_locations` (0–10000, default 100) and `customer_checkout_chance` (1–100%, default 5%) YAML options. Completing customer checkouts probabilistically triggers location checks.
+- YAML Options Guidance: Added recommendation docstrings and hints to options in `options.py`.
 
 #### Changed
 - Default Victory Goal: Changed default goal in `options.py` to **`All Licenses`** (Goal 2).
 - Store Level 1 Excluded: Removed `Store Level 1` location check since players begin the game at Store Level 1.
+- Extended Customer Checkout Range: Increased maximum `customer_checkout_locations` limit from 100 to 10,000 in `locations.py` and `options.py`.
 - Renamed all Python files in the APWorld to lowercase/snake_case (`items.py`, `locations.py`, `options.py`, `rules.py`, `license_data.py`).
 
 #### Fixed
 - Dynamic Purchase License Matching: Dynamically generated `Purchase License` location IDs from `item_table` to guarantee 100% ID alignment between Python APWorld and C# Client Mod.
 - Universal Tracker Crash (ZeroDivisionError): Populated `location_name_groups` with all location categories and corrected `Store Level` range starting at Level 2.
+- Prevent section upgrades from becoming unlocked while locations are disabled 
 
 ### Client Mod (C# / BepInEx 6 IL2CPP)
 
@@ -29,10 +32,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - License Purchase Location Handler: In-game computer license purchases automatically send `Purchase License X` location checks to the Archipelago server.
 - Customer Checkout Location Handler: Checking out customers at registers/self-checkouts probabilistically sends `Customer Checkout X` location checks based on server slot data options.
 - Inactive UI Object: Updated `UIHelper` refresh methods to include inactive UI components (`includeInactive = true`), updating received items even when computer tabs are currently closed.
+- Extended Customer Checkout Location Range: Updated `ArchipelagoIdHelper.cs` to support Customer Checkout location IDs up to 10,000.
 
 #### Fixed
+- Staff Hire Button Interaction: Refactored `PersonalPatches.cs` to fix staff hiring button interactability, dynamic money checks, and unlock status display across all staff types.
+- License UI Unlock Refresh: Updated `LicensePatches.cs` to refresh locked status text dynamically when product licenses are received.
+- Section Purchase Money Check: Disabled section room upgrade purchase button when the player lacks sufficient money.
 - Day Completed Offset Bug: Fixed `DayCompletedProgressPatch` sending `Day 2 Completed` on finishing Day 1 by correcting `__instance.CurrentDay - 1` calculation.
 - Price Overwriting Bug: Removed redundant UI price patches.
+- Prevent section upgrades from becoming unpurchasable while locations are disabled 
 
 ## [0.2.1] - 2026-07-19 — Initial Public Release
 
