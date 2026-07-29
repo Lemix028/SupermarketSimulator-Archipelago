@@ -227,9 +227,6 @@ class SupermarketWorld(World):
             if item_name in self.item_name_groups["Storage"] and not self.options.enable_storage_locks.value:
                 self.multiworld.push_precollected(self.create_item(item_name))
                 continue
-            if item_name in self.item_name_groups["Sections"] and not self.options.enable_section_locations.value:
-                self.multiworld.push_precollected(self.create_item(item_name))
-                continue
             if item_name in self.item_name_groups["Loans"] and not self.options.enable_loan_locks.value:
                 self.multiworld.push_precollected(self.create_item(item_name))
                 continue

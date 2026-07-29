@@ -59,6 +59,7 @@ namespace SupermarketArchipelago
                 EnableFurnitureLocks = GetSafeInt(slotData, "enable_furniture_locks", 1) == 1;
                 EnableVehicleLocks = GetSafeInt(slotData, "enable_vehicle_locks", 1) == 1;
                 EnableStorageLocks = GetSafeInt(slotData, "enable_storage_locks", 1) == 1; 
+                EnableSectionLocations = GetSafeInt(slotData, "enable_section_locations", 1) == 1;
                 EnableLoanLocks = GetSafeInt(slotData, "enable_loan_locks", 1) == 1;       
 
                 MaxStoreLevel = GetSafeInt(slotData, "max_store_level", 50);

@@ -49,11 +49,12 @@ namespace SupermarketArchipelago
     public class UpgradePurchaseBlockerPatch
     {
         [HarmonyPrefix]
-        public static bool Prefix(GrowthSectionItem __instance)
+        public static bool Prefix(GrowthSectionItem __instance, out bool __state)
         {
             int unlockedCount = ArchipelagoClient.GetReceivedSectionCount();
+            __state = __instance.ID <= unlockedCount;
 
-            if (__instance.ID > unlockedCount)
+            if (!__state)
                 return false;
 
             StoreLevelBypassPatch.UseFakeLevel = true;
@@ -61,13 +62,12 @@ namespace SupermarketArchipelago
         }
 
         [HarmonyPostfix]
-        public static void Postfix(GrowthSectionItem __instance)
+        public static void Postfix(GrowthSectionItem __instance, bool __state)
         {
-            
             StoreLevelBypassPatch.UseFakeLevel = false;
-            if (ArchipelagoConfig.EnableSectionLocations)
+            if (__state && ArchipelagoConfig.EnableSectionLocations)
             {
-                long locationId = ArchipelagoIdHelper.FromStorageUpgrade(__instance.ID);
+                long locationId = ArchipelagoIdHelper.FromSectionUpgrade(__instance.ID);
                 ArchipelagoClient.SendLocation(locationId);
             }
         }
@@ -105,6 +105,9 @@ namespace SupermarketArchipelago
             int unlockedCount = ArchipelagoClient.GetReceivedSectionCount();
             bool isApunlocked = item.ID <= unlockedCount;
             bool isSectionRequirementMet = (item.ID == 1) || item.m_ReachedRequiredSection;
+            bool canAfford = MoneyManager.Instance != null
+                && item.m_Section != null
+                && MoneyManager.Instance.Money >= item.m_Section.Cost;
 
             if (item.m_RequiredLevelLocalizedText != null)
             {
@@ -155,6 +158,8 @@ namespace SupermarketArchipelago
             }
             else
             {
+                if (item.m_PurchaseButton != null)
+                    item.m_PurchaseButton.interactable = canAfford;
 
                 if (btnLoc != null)
                 {
