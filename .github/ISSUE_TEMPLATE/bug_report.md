@@ -7,7 +7,7 @@ assignees: ''
 ---
 
 **Describe the Bug**
-A clear and concise description of what the bug is.
+A description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
@@ -16,7 +16,7 @@ Steps to reproduce the behavior:
 3. See error
 
 **Expected Behavior**
-A clear and concise description of what you expected to happen.
+A description of what you expected to happen.
 
 **Environment & Versions**
 - **Game Version:** [e.g. 1.5.2]
