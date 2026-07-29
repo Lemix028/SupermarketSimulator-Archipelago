@@ -18,20 +18,29 @@ namespace SupermarketArchipelago
         {
             _initEvent.Reset();
 
-            string safeName = string.IsNullOrEmpty(slotName) ? "Default" : slotName;
-            _currentHistoryPath = Path.Combine(Paths.ConfigPath, $"AP_History_{safeName}_{seed}.txt");
-            _processedSignatures.Clear();
-
-            if (File.Exists(_currentHistoryPath))
+            try
             {
-                var lines = File.ReadAllLines(_currentHistoryPath);
-                foreach (var line in lines)
+                string safeName = string.IsNullOrEmpty(slotName) ? "Default" : slotName;
+                string fileName = $"AP_History_{safeName}_{seed}.txt";
+
+                Directory.CreateDirectory(Paths.CachePath);
+                _currentHistoryPath = Path.Combine(Paths.CachePath, fileName);
+
+                _processedSignatures.Clear();
+
+                if (File.Exists(_currentHistoryPath))
                 {
-                    _processedSignatures.Add(line);
+                    var lines = File.ReadAllLines(_currentHistoryPath);
+                    foreach (var line in lines)
+                    {
+                        _processedSignatures.Add(line);
+                    }
                 }
             }
-
-            _initEvent.Set();
+            finally
+            {
+                _initEvent.Set();
+            }
         }
 
         public static void WaitForInit()
