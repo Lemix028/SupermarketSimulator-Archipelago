@@ -1,11 +1,5 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
-
----
-
 ## [0.2.2] - Unreleased
 
 ### APWorld (Python)
@@ -105,3 +99,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Filler execution system: Money Boost, XP Boost, Black Friday Event.
 - Save-file-aware history manager to prevent duplicate trap/filler execution across sessions.
 
+---
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
