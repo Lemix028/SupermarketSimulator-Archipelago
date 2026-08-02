@@ -1,4 +1,4 @@
-# Troubleshooting Guide — Supermarket Simulator Archipelago Mod
+# Troubleshooting Guide
 
 This document covers the most common problems encountered when setting up or playing the Archipelago integration.
 
@@ -127,11 +127,7 @@ To reactivate your mods later, just rename the file back to `winhttp.dll`.
 
 ## BepInEx Log Location
 
-The main log file is located at:
-```text
-<Steam Directory Game>/BepInEx/LogOutput.log
-
-```
+The main log file is located at: `<Steam Directory Game>/BepInEx/LogOutput.log` or `Steam Directory Game>/BepInEx/ErrorLog.log`
 
 Always share this log when reporting bugs — it contains all error messages from the mod.
 
@@ -151,6 +147,3 @@ Please include the following details in your report:
 * Your YAML file *(remove personal info if needed)*
 * The Archipelago server version you are connecting to *(e.g. 0.6.7)*
 * Your game version *(visible in the bottom-right of the Main Menu, e.g. 1.5.2)*
-
-
-```
