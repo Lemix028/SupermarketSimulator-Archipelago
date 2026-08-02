@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.2.2] - Unreleased
+## [0.3.0] - Unreleased
 
 ### APWorld (Python)
 
@@ -16,25 +16,26 @@
 - Renamed all Python files in the APWorld to lowercase/snake_case (`items.py`, `locations.py`, `options.py`, `rules.py`, `license_data.py`).
 
 #### Fixed
-- Dynamic Purchase License Matching: Dynamically generated `Purchase License` location IDs from `item_table` to guarantee 100% ID alignment between Python APWorld and C# Client Mod.
+- Furniture Item Classification: Updated `Speaker`, `Category Sign`, and `Trash Can` classification from `filler` to `useful` in `items.py`.
 - Universal Tracker Crash (ZeroDivisionError): Populated `location_name_groups` with all location categories and corrected `Store Level` range starting at Level 2.
-- Prevent section upgrades from becoming unlocked while locations are disabled 
+- Section Upgrade Unlocks: Prevented section upgrades from becoming unlocked while section locations are disabled.
 
 ### Client Mod (C# / BepInEx 6 IL2CPP)
 
 #### Added
-- License Purchase Location Handler: In-game computer license purchases automatically send `Purchase License X` location checks to the Archipelago server.
-- Customer Checkout Location Handler: Checking out customers at registers/self-checkouts probabilistically sends `Customer Checkout X` location checks based on server slot data options.
-- Inactive UI Object: Updated `UIHelper` refresh methods to include inactive UI components (`includeInactive = true`), updating received items even when computer tabs are currently closed.
-- Extended Customer Checkout Location Range: Updated `ArchipelagoIdHelper.cs` to support Customer Checkout location IDs up to 10,000.
+- Power Outage Manager: `PowerOutageManager.cs` to handle store light dimming and 60-second restoration in Unity's `Update()` loop.
+- Notification Queue & Release Filter: Implemented in-game notification queue (`_queue`) in `NotificationManager.cs` with dynamic speedup, and ensured Goal Release displays exclusively `"Goal Completed! Releasing all items!"`.
+- Single Self-Found Item Notification
+- License Purchase Location Handler
+- Customer Checkout Location Handler
 
 #### Fixed
-- Staff Hire Button Interaction: Refactored `PersonalPatches.cs` to fix staff hiring button interactability, dynamic money checks, and unlock status display across all staff types.
-- License UI Unlock Refresh: Updated `LicensePatches.cs` to refresh locked status text dynamically when product licenses are received.
-- Section Purchase Money Check: Disabled section room upgrade purchase button when the player lacks sufficient money.
+- Staff Hiring Locks: Added `SelectableInteractablePatch` to enforce `interactable = false` for all staff members whose Archipelago item has not been received, keeping hire buttons locked and unclickable.
+- Store Level Goal Verification: Hooked goal verification into `SetStoreReady`, `CheckLevelChange`, `AddPoint`, `RefreshLevel`, and XP boosts so level goal completion is detected immediately.
+- Money Boost Multiplier Fix: Prevented Money Boost filler items from being multiplied by `CheckoutIncomeMultiplier` or triggering false checkout location checks.
+- Inactive UI Component Refresh: Updated `UIHelper` refresh methods (including `RefreshSectionUI`) to include inactive UI components (`includeInactive = true`), unlocking received growth sections immediately in the background.
 - Day Completed Offset Bug: Fixed `DayCompletedProgressPatch` sending `Day 2 Completed` on finishing Day 1 by correcting `__instance.CurrentDay - 1` calculation.
-- Price Overwriting Bug: Removed redundant UI price patches.
-- Prevent section upgrades from becoming unpurchasable while locations are disabled 
+- Section Purchase Money Check: Disabled section room upgrade purchase button when the player lacks sufficient money.
 
 ## [0.2.1] - 2026-07-19 — Initial Public Release
 
