@@ -113,8 +113,7 @@ If you want to modify or compile this mod yourself:
 
 ### Setup Reference DLLs
 
-Since Supermarket Simulator uses the Unity IL2CPP backend, you need the stripped assembly DLLs for compiling. You can find all DLLs in `BepInEx/interop/` and `BepInEx/core/`.
-    
+Since Supermarket Simulator uses the Unity IL2CPP backend, you need the stripped assembly DLLs for compiling. You can find all required DLLs in `BepInEx/interop/` and `BepInEx/core/`, or pre-included in the local `csharp-client/SupermarketSimArchipelago/lib/` directory of this repository.
 
 ## License
 
