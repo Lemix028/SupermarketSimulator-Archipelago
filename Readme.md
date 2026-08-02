@@ -2,7 +2,7 @@
 # Supermarket Simulator - Archipelago Multiworld Client Mod
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Game Version](https://img.shields.io/badge/Game%20Version-1.5.2-blue.svg)](https://store.steampowered.com/app/2670630/Supermarket_Simulator/)
+[![Game Version](https://img.shields.io/badge/Game%20Version-1.5.3-blue.svg)](https://store.steampowered.com/app/2670630/Supermarket_Simulator/)
 [![Framework](https://img.shields.io/badge/Framework-BepInEx%206%20(IL2CPP)-orange.svg)](https://github.com/BepInEx/BepInEx)
 
 [Troubleshooting FAQ](Troubleshooting.md) | [Report a Bug](https://github.com/Lemix028/SupermarketSimulator-Archipelago/issues)
@@ -12,6 +12,9 @@
 This is a **C# Client Mod** for integrating *Supermarket Simulator* into the **Archipelago Multiworld Network**.
 
 The repository also includes the Archipelago World definition (APWorld) located in the `apworld` directory.
+
+> [!WARNING]
+> **Unstable**: This mod is currently in an unstable state and bug-free experience cannot be guaranteed. Please keep this in mind while playing and report any bugs on the [Issues page](https://github.com/Lemix028/SupermarketSimulator-Archipelago/issues)!
 
 ## Features
 
@@ -32,6 +35,11 @@ The repository also includes the Archipelago World definition (APWorld) located 
 * Vehicles
 * Loan authorizations
 
+### Victory Goals
+* **All Licenses**: Unlock every product license to win (optional: exclude specific licenses via config).
+* **Store Level**: Reach a configured target store level.
+* **Completed Days**: Reach a configured target day count.
+
 ### Fillers and Traps
 * Boosts (Money, XP, Black Friday event)
 * Negative events (tax audits, power outages, dust storms, trash floods, expired products, robberies)
@@ -49,7 +57,7 @@ The repository also includes the Archipelago World definition (APWorld) located 
 ## Installation
 
 ### 1. Install BepInEx 6
-1. Download **BepInEx 6 (Unity IL2CPP for Windows x64)** from the [official repository](https://github.com/BepInEx/BepInEx). Currently, the **IL2CPP** version is only available through the [Bleeding Edge Releases](https://builds.bepinex.dev/projects/bepinex_be). Not the **Mono** version!
+1. Download **BepInEx 6 (Unity IL2CPP for Windows x64)** from the [official repository](https://github.com/BepInEx/BepInEx). Currently, the **IL2CPP** version is only available through the [Bleeding Edge Releases](https://builds.bepinex.dev/projects/bepinex_be). Not the **Mono** version! 
 2. Extract all files from the BepInEx `.zip` archive directly into your main **Supermarket Simulator** game folder (where `Supermarket Simulator.exe` is located).
 
 ### 2. Install the Mod and APWorld
@@ -57,6 +65,8 @@ The repository also includes the Archipelago World definition (APWorld) located 
 2. Open your game's directory and navigate to `BepInEx/plugins/`. (If the folder doesn't exist, run the game once to let BepInEx generate it, or create it manually).
 3. Extract `SupermarketSimArchipelago.dll` and its required dependency `.dll` files into the `plugins/` folder.
 4. Place the downloaded `.apworld` file in your Archipelago custom worlds directory: `C:\ProgramData\Archipelago\custom_worlds`
+
+> **Note:** Tested on **Supermarket Simulator v1.5.3**.
 
 ---
 
@@ -82,7 +92,7 @@ If you prefer, you can pre-configure your credentials before launching the game:
    ```ini
    [Archipelago]
    ServerAddress = archipelago.gg:38281
-   SlotName = Lemix028
+   SlotName = PlayerName
    Password = 
    ```
 4. Save the file and start the game. Click **AP Server Connect** in the Main Menu to open the login UI with these details pre-filled, then click **Connect** to establish the connection.
@@ -111,5 +121,15 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Changelog
 
-For a full version history, see the [GitHub Releases page](https://github.com/Lemix028/SupermarketSimulator-Archipelago/releases).
+For a full list of changes, see the [CHANGELOG.md](CHANGELOG.md) or check the [GitHub Releases](https://github.com/Lemix028/SupermarketSimulator-Archipelago/releases) page.
 
+## Credits
+
+Special thanks to:
+- **xdesyyx** - for testing and feedback!
+
+## Support
+
+If you enjoy this mod and want to support its development, you can buy me a coffee:
+
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-ff5e5f?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/lemix)
