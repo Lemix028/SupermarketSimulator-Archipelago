@@ -1,41 +1,194 @@
-name: Build and Release APWorld
+name: Build and Release
 
 on:
   release:
     types: [published]
-  push:
-    tags:
-      - 'v*'
+
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Tag name for the release (e.g. v0.2.1)'
-        required: false
-        default: 'v0.2.2'
+        description: "Existing release tag, for example v0.3.0"
+        required: true
+        default: "v0.3.0"
 
 permissions:
   contents: write
 
+env:
+  PROJECT_PATH: csharp-client/SupermarketSimArchipelago/SupermarketSimArchipelago.csproj
+  APWORLD_DIRECTORY: apworld/supermarket_simulator
+  RELEASE_DIRECTORY: release-output
+
 jobs:
-  build-apworld:
-    runs-on: ubuntu-latest
+  build:
+    name: Build APWorld and Client
+    runs-on: windows-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare APWorld files
+      - name: Determine release tag and version
+        id: version
+        shell: pwsh
         run: |
-          mkdir -p supermarket_simulator
-          cp -r apworld/supermarket_simulator/* supermarket_simulator/
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $tag = "${{ inputs.tag_name }}"
+          }
+          else {
+            $tag = "${{ github.event.release.tag_name }}"
+          }
 
-      - name: Zip APWorld
+          if ([string]::IsNullOrWhiteSpace($tag)) {
+            throw "Could not determine the release tag."
+          }
+
+          $version = $tag.TrimStart("v")
+
+          "tag=$tag" >> $env:GITHUB_OUTPUT
+          "version=$version" >> $env:GITHUB_OUTPUT
+
+          Write-Host "Release tag: $tag"
+          Write-Host "Version: $version"
+
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "6.0.x"
+
+      - name: Verify reference DLLs
+        shell: pwsh
         run: |
-          zip -r supermarket_simulator.apworld supermarket_simulator
+          $libDirectory = "csharp-client/SupermarketSimArchipelago/lib"
 
-      - name: Upload APWorld to Release
+          $requiredFiles = @(
+            "0Harmony.dll",
+            "Assembly-CSharp.dll",
+            "BepInEx.Core.dll",
+            "BepInEx.Unity.IL2CPP.dll",
+            "Il2CppInterop.Runtime.dll",
+            "Il2Cppmscorlib.dll",
+            "PhotonUnityNetworking.dll",
+            "Unity.Localization.dll",
+            "Unity.TextMeshPro.dll",
+            "UnityEngine.CoreModule.dll",
+            "UnityEngine.IMGUIModule.dll",
+            "UnityEngine.InputLegacyModule.dll",
+            "UnityEngine.TextRenderingModule.dll",
+            "UnityEngine.UI.dll",
+            "UnityEngine.UIElementsModule.dll",
+            "UnityEngine.UIModule.dll"
+          )
+
+          $missingFiles = @()
+
+          foreach ($file in $requiredFiles) {
+            $path = Join-Path $libDirectory $file
+
+            if (-not (Test-Path $path)) {
+              $missingFiles += $file
+            }
+          }
+
+          if ($missingFiles.Count -gt 0) {
+            Write-Host "Missing reference DLLs:"
+            $missingFiles | ForEach-Object { Write-Host " - $_" }
+            throw "One or more required reference DLLs are missing."
+          }
+
+          Write-Host "All required reference DLLs are available."
+
+      - name: Restore client dependencies
+        run: >
+          dotnet restore
+          "${{ env.PROJECT_PATH }}"
+
+      - name: Build client
+        run: >
+          dotnet build
+          "${{ env.PROJECT_PATH }}"
+          --configuration Release
+          --no-restore
+          /p:Version=${{ steps.version.outputs.version }}
+          /p:FileVersion=${{ steps.version.outputs.version }}
+          /p:AssemblyVersion=${{ steps.version.outputs.version }}.0
+
+      - name: Prepare client package
+        shell: pwsh
+        run: |
+          $buildDirectory = "csharp-client/SupermarketSimArchipelago/bin/Release/net6.0"
+          $packageDirectory = "${{ env.RELEASE_DIRECTORY }}/client"
+
+          New-Item -ItemType Directory -Force -Path $packageDirectory | Out-Null
+
+          $files = @(
+            "SupermarketSimArchipelago.dll",
+            "Archipelago.MultiClient.Net.dll",
+            "Newtonsoft.Json.dll"
+          )
+
+          foreach ($file in $files) {
+            $source = Join-Path $buildDirectory $file
+
+            if (-not (Test-Path $source)) {
+              throw "Required release file not found: $source"
+            }
+
+            Copy-Item $source $packageDirectory
+          }
+
+      - name: Create client ZIP
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $zipPath = "${{ env.RELEASE_DIRECTORY }}/SupermarketArchipelago_Client_v$version.zip"
+
+          Compress-Archive `
+            -Path "${{ env.RELEASE_DIRECTORY }}/client/*" `
+            -DestinationPath $zipPath `
+            -Force
+
+          Write-Host "Created $zipPath"
+
+      - name: Prepare APWorld
+        shell: pwsh
+        run: |
+          $packageRoot = "${{ env.RELEASE_DIRECTORY }}/apworld"
+          $worldDirectory = Join-Path $packageRoot "supermarket_simulator"
+
+          New-Item -ItemType Directory -Force -Path $worldDirectory | Out-Null
+
+          Copy-Item `
+            -Path "${{ env.APWORLD_DIRECTORY }}/*" `
+            -Destination $worldDirectory `
+            -Recurse `
+            -Force
+
+          Compress-Archive `
+            -Path $worldDirectory `
+            -DestinationPath "${{ env.RELEASE_DIRECTORY }}/supermarket_simulator.zip" `
+            -Force
+
+          Move-Item `
+            -Path "${{ env.RELEASE_DIRECTORY }}/supermarket_simulator.zip" `
+            -Destination "${{ env.RELEASE_DIRECTORY }}/supermarket_simulator.apworld" `
+            -Force
+
+      - name: Show release files
+        shell: pwsh
+        run: |
+          Get-ChildItem "${{ env.RELEASE_DIRECTORY }}" -File |
+            ForEach-Object {
+              Write-Host "$($_.Name) - $($_.Length) bytes"
+            }
+
+      - name: Upload files to release
         uses: softprops/action-gh-release@v2
         with:
-          files: supermarket_simulator.apworld
-          tag_name: ${{ github.event.inputs.tag_name || github.ref_name }}
+          tag_name: ${{ steps.version.outputs.tag }}
+          files: |
+            release-output/SupermarketArchipelago_Client_v${{ steps.version.outputs.version }}.zip
+            release-output/supermarket_simulator.apworld
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
