@@ -16,4 +16,5 @@ test.bat
 build.bat
 build.py
 __pycache__/
-*.pyc
+*.pyc
+Update-References.ps1
