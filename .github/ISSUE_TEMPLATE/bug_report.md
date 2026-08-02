@@ -1,9 +1,10 @@
 ---
 name: Bug Report
 about: Create a report to help us fix an issue with the mod
-title: '[BUG] '
+title: "[BUG] "
 labels: bug
 assignees: ''
+
 ---
 
 **Describe the Bug**
