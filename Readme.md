@@ -18,6 +18,8 @@ The repository also includes the Archipelago World definition (APWorld) located 
 
 ## Features
 
+> Check out the [Feature Guide](docs/en_Supermarket_Simulator.md) for more details.
+
 ### Tracked Locations
 * Store levels completed at configured intervals
 * Days completed at configured intervals
@@ -66,7 +68,7 @@ The repository also includes the Archipelago World definition (APWorld) located 
 3. Extract `SupermarketSimArchipelago.dll` and its required dependency `.dll` files into the `plugins/` folder.
 4. Place the downloaded `.apworld` file in your Archipelago custom worlds directory: `C:\ProgramData\Archipelago\custom_worlds`
 
-> **Note:** Tested on **Supermarket Simulator v1.5.3**.
+> **Note:** Tested on Steam version **Supermarket Simulator v1.5.3**.
 
 ---
 
