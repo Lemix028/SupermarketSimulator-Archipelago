@@ -39,16 +39,7 @@ namespace SupermarketArchipelago
             if (MoneyManager.Instance == null)
                 return;
             float amount = UnityEngine.Random.Range(50f, 250f);
-            
-            MoneyTransitionPatch.IsMoneyBoost = true;
-            try
-            {
-                MoneyManager.Instance.MoneyTransition(amount, MoneyManager.TransitionType.CHECKOUT_INCOME);
-            }
-            finally
-            {
-                MoneyTransitionPatch.IsMoneyBoost = false;
-            }
+            MoneyManager.Instance.MoneyTransition(amount, MoneyManager.TransitionType.CHECKOUT_INCOME);
         }
 
         /// <summary>

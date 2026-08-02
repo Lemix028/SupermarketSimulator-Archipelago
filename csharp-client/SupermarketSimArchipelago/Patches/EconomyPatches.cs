@@ -6,13 +6,9 @@ namespace SupermarketArchipelago
     [HarmonyPatch(typeof(MoneyManager), "MoneyTransition")]
     public class MoneyTransitionPatch
     {
-        public static bool IsMoneyBoost = false;
-
         [HarmonyPrefix]
         public static void Prefix(ref float amount, MoneyManager.TransitionType type)
         {
-            if (IsMoneyBoost) return;
-
             if (type == MoneyManager.TransitionType.CHECKOUT_INCOME)
             {
                 amount *= ArchipelagoConfig.CheckoutIncomeMultiplier;
@@ -28,7 +24,7 @@ namespace SupermarketArchipelago
         {
             ArchipelagoMoneyHandler.CheckMoneyMilestones();
 
-            if (!IsMoneyBoost && type == MoneyManager.TransitionType.CHECKOUT_INCOME)
+            if (type == MoneyManager.TransitionType.CHECKOUT_INCOME)
             {
                 ArchipelagoCheckoutHandler.CheckCustomerCheckoutLocation();
             }
