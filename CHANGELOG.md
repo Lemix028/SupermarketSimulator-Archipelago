@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.3.0] - Unreleased
+## [0.3.0] - 03.08.2026
 
 ### APWorld (Python)
 
