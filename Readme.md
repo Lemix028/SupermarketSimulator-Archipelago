@@ -18,7 +18,7 @@ The repository also includes the Archipelago World definition (APWorld) located 
 
 ## Features
 
-> Check out the [Feature Guide](docs/en_Supermarket_Simulator.md) for more details.
+> Check out the [Feature Guide](apworld/supermarket_simulator/docs/en_Supermarket_Simulator.md) for more details.
 
 ### Tracked Locations
 * Store levels completed at configured intervals
