@@ -1,7 +1,6 @@
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.Localization.Components;
-using SupermarketSimArchipelago; 
 
 namespace SupermarketArchipelago
 {

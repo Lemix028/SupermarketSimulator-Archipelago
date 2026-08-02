@@ -1,8 +1,7 @@
 ﻿using HarmonyLib;
-using SupermarketArchipelago;
 
 
-namespace SupermarketSimArchipelago
+namespace SupermarketArchipelago
 {
     [HarmonyPatch(typeof(StoreLevelManager), nameof(StoreLevelManager.CurrentLevel), MethodType.Getter)]
     public class StoreLevelBypassPatch

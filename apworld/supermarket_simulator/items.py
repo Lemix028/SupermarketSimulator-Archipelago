@@ -89,13 +89,13 @@ item_table = {
     "Spot Light": ItemData(420, ItemClassification.useful),
     "Self Checkout Counter": ItemData(421, ItemClassification.useful),
     "Self Checkout Counter Mirrored": ItemData(422, ItemClassification.useful),
-    "Speaker": ItemData(423, ItemClassification.filler),
-    "Category Sign": ItemData(424, ItemClassification.filler),
+    "Speaker": ItemData(423, ItemClassification.useful),
+    "Category Sign": ItemData(424, ItemClassification.useful),
     "Security Camera": ItemData(425, ItemClassification.useful),
     "Security Antenna": ItemData(426, ItemClassification.useful),
     "Scale": ItemData(427, ItemClassification.progression),
     "Produce Stall": ItemData(428, ItemClassification.progression),
-    "Trash Can": ItemData(429, ItemClassification.filler),
+    "Trash Can": ItemData(429, ItemClassification.useful),
 
 
     # === FILLERS (Offset 500+) ===

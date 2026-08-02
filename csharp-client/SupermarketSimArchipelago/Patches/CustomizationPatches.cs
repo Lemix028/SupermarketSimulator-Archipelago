@@ -48,7 +48,7 @@ namespace SupermarketArchipelago
                 }
             }
             // Debug Dump of all licenses for reference
-            //  SupermarketSimArchipelago.LicenseUiHelper.DumpLicensesReference();
+            //  SupermarketArchipelago.LicenseUiHelper.DumpLicensesReference();
         }
     }
 

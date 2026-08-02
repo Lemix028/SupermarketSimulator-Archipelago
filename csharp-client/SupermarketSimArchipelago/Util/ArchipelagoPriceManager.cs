@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SupermarketSimArchipelago
+namespace SupermarketArchipelago
 {
     public static class ArchipelagoPriceManager
     {

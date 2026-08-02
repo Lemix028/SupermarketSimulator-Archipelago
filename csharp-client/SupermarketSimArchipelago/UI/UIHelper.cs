@@ -1,5 +1,5 @@
 #nullable disable
-using SupermarketSimArchipelago;
+using SupermarketArchipelago;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -11,8 +11,6 @@ namespace SupermarketArchipelago
 {
     public static class UIHelper
     {
-
-        private static Dictionary<Light, float> _lightsToRestore;
         /// <summary>
         /// Update License UI
         /// </summary>
@@ -49,8 +47,8 @@ namespace SupermarketArchipelago
         /// </summary>
         public static void RefreshSectionUI(int gameSectionID)
         {
-            // Find all active section items in the current UI menu
-            var items = GameObject.FindObjectsOfType<GrowthSectionItem>();
+            // Find all section items (including inactive ones when tab is closed)
+            var items = GameObject.FindObjectsOfType<GrowthSectionItem>(true);
             if (items == null) return;
 
             foreach (var item in items)
@@ -174,56 +172,10 @@ namespace SupermarketArchipelago
         /// </summary>
         public static void TriggerPowerOutageEvent(float durationSeconds)
         {
-
-            var lights = GameObject.FindObjectsOfType<Light>();
-            if (lights == null) return;
-
-            var disabledLights = new Dictionary<Light, float>();
-
-            foreach (var light in lights)
+            if (PowerOutageManager.Instance != null)
             {
-                if (light != null && light.type != LightType.Directional)
-                {
-                    disabledLights[light] = light.intensity;
-                    light.intensity = 0f;
-                }
+                PowerOutageManager.Instance.StartPowerOutage(durationSeconds);
             }
-
-            Timer timer = new Timer(
-                new TimerCallback(OnPowerOutageTimerElapsed),
-                disabledLights,
-                (int)(durationSeconds * 1000),
-                Timeout.Infinite
-            );
-        }
-
-        /// <summary>
-        /// Explicit callback method executed when the background timer runs out
-        /// </summary>
-        private static void OnPowerOutageTimerElapsed(object state)
-        {
-            _lightsToRestore = state as Dictionary<Light, float>;
-            if (_lightsToRestore == null) return;
-
-            UnityMainThreadDispatcher.Enqueue(new Action(RestoreLightsOnMainThread));
-        }
-
-        /// <summary>
-        /// Safe execution wrapper running back on Unity's Main Thread loop
-        /// </summary>
-        private static void RestoreLightsOnMainThread()
-        {
-            if (_lightsToRestore == null) return;
-
-            foreach (var kvp in _lightsToRestore)
-            {
-                if (kvp.Key != null)
-                {
-                    kvp.Key.intensity = kvp.Value; 
-                }
-            }
-
-            _lightsToRestore = null; // Clear allocation memory safely
         }
 
         /// <summary>

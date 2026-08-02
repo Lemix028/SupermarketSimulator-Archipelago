@@ -22,9 +22,17 @@ namespace SupermarketArchipelago
 
             if (ArchipelagoConfig.GoalType.Equals("Level", StringComparison.OrdinalIgnoreCase))
             {
-                if (StoreLevelManager.Instance != null && StoreLevelManager.Instance.CurrentLevel >= ArchipelagoConfig.GoalValue)
+                if (StoreLevelManager.Instance != null)
                 {
-                    TriggerVictory();
+                    bool wasFake = StoreLevelBypassPatch.UseFakeLevel;
+                    StoreLevelBypassPatch.UseFakeLevel = false;
+                    int realLevel = StoreLevelManager.Instance.CurrentLevel;
+                    StoreLevelBypassPatch.UseFakeLevel = wasFake;
+
+                    if (realLevel >= ArchipelagoConfig.GoalValue)
+                    {
+                        TriggerVictory();
+                    }
                 }
             }
         }
@@ -81,6 +89,26 @@ namespace SupermarketArchipelago
 
     [HarmonyPatch(typeof(StoreLevelManager), nameof(StoreLevelManager.RefreshLevel))]
     public class GoalLevelPatch
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            GoalHandler.CheckLevelGoal();
+        }
+    }
+
+    [HarmonyPatch(typeof(StoreLevelManager), nameof(StoreLevelManager.CheckLevelChange))]
+    public class GoalCheckLevelChangePatch
+    {
+        [HarmonyPostfix]
+        public static void Postfix()
+        {
+            GoalHandler.CheckLevelGoal();
+        }
+    }
+
+    [HarmonyPatch(typeof(StoreLevelManager), nameof(StoreLevelManager.AddPoint))]
+    public class GoalAddPointPatch
     {
         [HarmonyPostfix]
         public static void Postfix()

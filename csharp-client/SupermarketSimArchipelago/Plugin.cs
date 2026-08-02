@@ -13,7 +13,7 @@ namespace SupermarketArchipelago
     {
         public const string PLUGIN_GUID = "com.lemix028.supermarketsimulator.archipelago";
         public const string PLUGIN_NAME = "Supermarket Simulator Archipelago";
-        public const string PLUGIN_VERSION = "0.2.2"; 
+        public const string PLUGIN_VERSION = "0.3.0"; 
     }
 
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
@@ -21,7 +21,7 @@ namespace SupermarketArchipelago
     {
         public static Harmony HarmonyInstance;
         public static SaveManager.ProgressionContainer ProgressionInstance;
-        public static ManualLogSource Log;
+        new public static ManualLogSource Log;
         public static BepInEx.Configuration.ConfigFile ConfigFileInstance;
         public override void Load()
         {
@@ -39,6 +39,7 @@ namespace SupermarketArchipelago
 
             ClassInjector.RegisterTypeInIl2Cpp<ConnectedUi>();
             ClassInjector.RegisterTypeInIl2Cpp<ArchipelagoNotificationManager>();
+            ClassInjector.RegisterTypeInIl2Cpp<PowerOutageManager>();
             ClassInjector.RegisterTypeInIl2Cpp<UnityMainThreadDispatcher>();
 
 
@@ -56,7 +57,8 @@ namespace SupermarketArchipelago
             HarmonyInstance.PatchAll();
 
             ArchipelagoNotificationManager.Create();
-            //AddComponent<SupermarketSimArchipelago.SupermarketApDebugTools>();
+            PowerOutageManager.Create();
+            //AddComponent<SupermarketArchipelago.SupermarketApDebugTools>();
 
             Log.LogInfo($"{PluginInfo.PLUGIN_NAME} v{PluginInfo.PLUGIN_VERSION} fully loaded!");
         }

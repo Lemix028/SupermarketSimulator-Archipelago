@@ -7,7 +7,7 @@ using UnityEngine.Localization.Components;
 using TMPro;
 using JetBrains.Annotations;
 
-namespace SupermarketSimArchipelago
+namespace SupermarketArchipelago
 {
     [HarmonyPatch(typeof(FurnitureSalesItem), nameof(FurnitureSalesItem.AddToCart))]
     public class FurnitureAddToCartPatch

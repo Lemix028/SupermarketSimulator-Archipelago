@@ -39,8 +39,16 @@ namespace SupermarketArchipelago
             if (MoneyManager.Instance == null)
                 return;
             float amount = UnityEngine.Random.Range(50f, 250f);
-            // Adds $50 directly to the store funds
-            MoneyManager.Instance.MoneyTransition(amount, MoneyManager.TransitionType.CHECKOUT_INCOME);
+            
+            MoneyTransitionPatch.IsMoneyBoost = true;
+            try
+            {
+                MoneyManager.Instance.MoneyTransition(amount, MoneyManager.TransitionType.CHECKOUT_INCOME);
+            }
+            finally
+            {
+                MoneyTransitionPatch.IsMoneyBoost = false;
+            }
         }
 
         /// <summary>
@@ -54,6 +62,7 @@ namespace SupermarketArchipelago
             int xpFraction = UnityEngine.Random.Range(15, 80);
 
             StoreLevelManager.Instance.AddPoint(xpFraction);
+            GoalHandler.CheckLevelGoal();
         }
 
 

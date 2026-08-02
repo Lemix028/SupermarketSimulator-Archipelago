@@ -1,10 +1,9 @@
 ﻿using HarmonyLib;
-using SupermarketArchipelago;
 using System;
 using UnityEngine;
 using UnityEngine.Localization.Components;
 
-namespace SupermarketSimArchipelago
+namespace SupermarketArchipelago
 {
     [HarmonyPatch(typeof(VehicleSaleItem), nameof(VehicleSaleItem.Purchase))]
     public class VehiclePatch

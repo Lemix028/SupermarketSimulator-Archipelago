@@ -20,6 +20,8 @@ namespace SupermarketArchipelago
                 int locationId = ArchipelagoIdHelper.FromStoreLevel(lvl);
                 ArchipelagoClient.SendLocation(locationId);
             }
+
+            GoalHandler.CheckLevelGoal();
         }
     }
 
@@ -31,13 +33,16 @@ namespace SupermarketArchipelago
         {
             int completedDay = __instance.CurrentDay - 1;
 
-            if (completedDay < 1 || completedDay > ArchipelagoConfig.MaxDaysCompleted) return;
-
-            if (completedDay % ArchipelagoConfig.DaysCompletedInterval == 0)
+            if (completedDay >= 1 && completedDay <= ArchipelagoConfig.MaxDaysCompleted)
             {
-                int locationId = ArchipelagoIdHelper.FromDayCompleted(completedDay);
-                ArchipelagoClient.SendLocation(locationId);
+                if (completedDay % ArchipelagoConfig.DaysCompletedInterval == 0)
+                {
+                    int locationId = ArchipelagoIdHelper.FromDayCompleted(completedDay);
+                    ArchipelagoClient.SendLocation(locationId);
+                }
             }
+
+            GoalHandler.CheckDaysGoal();
         }
     }
 }

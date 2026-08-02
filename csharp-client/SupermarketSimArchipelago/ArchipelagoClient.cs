@@ -4,7 +4,6 @@ using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
 using BepInEx.Logging;
-using SupermarketSimArchipelago;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -222,6 +221,7 @@ namespace SupermarketArchipelago
             
             string itemName = item.ItemName ?? "Unknown";
             string playerName = item.Player?.Name ?? "Unknown";
+            bool isSelfFound = _session != null && item.Player != null && item.Player.Slot == _session.ConnectionInfo.Slot;
 
             if (IsStoreReady)
             {
@@ -232,15 +232,24 @@ namespace SupermarketArchipelago
 
                     if (type == ApItemType.Trap)
                     {
-                        ArchipelagoNotificationManager.Instance.Show($"Received Trap: '{playerName}' sent you {itemName}!", 1);
+                        if (isSelfFound)
+                            ArchipelagoNotificationManager.Instance.Show($"Found your '{itemName}'!", 1);
+                        else
+                            ArchipelagoNotificationManager.Instance.Show($"Received Trap: '{playerName}' sent you {itemName}!", 1);
                     }
                     else if (type == ApItemType.Filler)
                     {
-                        ArchipelagoNotificationManager.Instance.Show($"Received Filler: {itemName}!", 0);
+                        if (isSelfFound)
+                            ArchipelagoNotificationManager.Instance.Show($"Found your '{itemName}'!", 0);
+                        else
+                            ArchipelagoNotificationManager.Instance.Show($"Received Filler: {itemName}!", 0);
                     }
                     else
                     {
-                        ArchipelagoNotificationManager.Instance.Show($"Received Item: {itemName} by {playerName}!", 3);
+                        if (isSelfFound)
+                            ArchipelagoNotificationManager.Instance.Show($"Found your '{itemName}'!", 3);
+                        else
+                            ArchipelagoNotificationManager.Instance.Show($"Received Item: '{itemName}' from {playerName}!", 3);
                     }
                 });
             }
@@ -301,6 +310,8 @@ namespace SupermarketArchipelago
                 {
                     ProcessReceivedItem(item);
                 }
+
+                GoalHandler.CheckCurrentProgress();
             }
         }
 
@@ -509,14 +520,17 @@ namespace SupermarketArchipelago
                 var scoutedDict = ScoutedLocationsCache.First(x => x.Key == locationId);
                 if (scoutedDict.Value != null)
                 {
-
                     string targetItemName = scoutedDict.Value?.ItemName ?? "Unknown";
                     string targetPlayerName = scoutedDict.Value?.Player?.Name ?? "Unknown";
+                    bool isSelf = _session != null && scoutedDict.Value.Player != null && scoutedDict.Value.Player.Slot == _session.ConnectionInfo.Slot;
 
-                    UnityMainThreadDispatcher.Enqueue(() =>
+                    if (!isSelf)
                     {
-                        ArchipelagoNotificationManager.Instance.Show($"Sent '{targetItemName}' to {targetPlayerName}!", 2);
-                    });
+                        UnityMainThreadDispatcher.Enqueue(() =>
+                        {
+                            ArchipelagoNotificationManager.Instance.Show($"Sent '{targetItemName}' to {targetPlayerName}!", 2);
+                        });
+                    }
                 }
             }
             catch (Exception ex)
