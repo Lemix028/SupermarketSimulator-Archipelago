@@ -64,3 +64,5 @@ The following DLCs are fully supported and can be individually enabled via your 
 - Hardware DLC
 - Clothing DLC
 - Essentials DLC
+
+If a DLC is disabled in your settings, all associated product licenses, items, and features will remain locked in-game.
