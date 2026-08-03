@@ -62,6 +62,8 @@ The repository also includes the Archipelago World definition (APWorld) located 
 1. Download **BepInEx 6 (Unity IL2CPP for Windows x64)** from the [official repository](https://github.com/BepInEx/BepInEx). Currently, the **IL2CPP** version is only available through the [Bleeding Edge Releases](https://builds.bepinex.dev/projects/bepinex_be). Not the **Mono** version! 
 2. Extract all files from the BepInEx `.zip` archive directly into your main **Supermarket Simulator** game folder (where `Supermarket Simulator.exe` is located).
 
+> **Note:** Currently confirmed working BepInEx 6 Version is BepInEx 6.0.0-be.785-6abdba4.
+
 ### 2. Install the Mod and APWorld
 1. Download the latest release from the [GitHub Releases page](https://github.com/Lemix028/SupermarketSimulator-Archipelago/releases). Both the client mod (SupermarketArchipelago_Client_vX.X.X.zip ) and the Archipelago world package (.apworld) are available there.
 2. Open your game's directory and navigate to `BepInEx/plugins/`. (If the folder doesn't exist, run the game once to let BepInEx generate it, or create it manually).
