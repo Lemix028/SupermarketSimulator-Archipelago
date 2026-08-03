@@ -129,6 +129,12 @@ For a full list of changes, see the [CHANGELOG.md](CHANGELOG.md) or check the [G
 Special thanks to:
 - **xdesyyx** - for testing and feedback!
 
+## AI Disclosure
+
+I **used** AI tools (Gemini Flash 3.5/3.6 Flash / GPT-5.6 Sol) during development to help with writing documentation, translating text, generating code blocks, debugging issues, exploring concepts, and optimizing performance. Using AI makes many tasks easier and significantly speeds up building features and solving problems.
+
+This project is **not** "vibe-coded". Every piece of generated code and documentation was carefully reviewed, verified, and tested in actual gameplay. However, as with any software, bugs cannot be entirely ruled out. If you encounter any issues, please report them on GitHub or on Discord!
+
 ## Support
 
 If you enjoy this mod and want to support its development, you can buy me a coffee:
