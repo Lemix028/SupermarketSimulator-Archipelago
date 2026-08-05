@@ -60,6 +60,12 @@ class StoreLevelInterval(Range):
     range_end = 10
     default = 1
 
+    def verify(self, world, player_name, plando_options):
+        max_lvl = getattr(world.options, "max_store_level", None)
+        if max_lvl and self.value > max_lvl.value:
+            self.value = max_lvl.value
+        super().verify(world, player_name, plando_options)
+
 class MaxDaysCompleted(Range):
     """The maximum number of completed days that contain checks.
         Recommended: Depends how long you want to play."""
@@ -75,6 +81,12 @@ class DaysCompletedInterval(Range):
     range_start = 1
     range_end = 20
     default = 1
+
+    def verify(self, world, player_name, plando_options):
+        max_days = getattr(world.options, "max_days_completed", None)
+        if max_days and self.value > max_days.value:
+            self.value = max_days.value
+        super().verify(world, player_name, plando_options)
 
 class EnableSectionLocations(DefaultOnToggle):
     """If enabled, buy section room locations can be generated.
@@ -269,20 +281,35 @@ class FreeCustomizables(Toggle):
     default = 1
 
 class CustomerCheckoutLocations(Range):
-    """Number of Customer Checkout location checks generated in the multiworld. Every time a customer checks out, there is a chance to trigger a check at one of these locations.
-    Recommended: Your preference, but having some checks is recommended."""
+    """Number of Customer Checkout location checks generated. Every time a customer checks out, there is a chance to trigger a check at one of these locations.
+    Recommended: 200 (Depends on how long you want to play.)"""
     display_name = "Customer Checkout Locations"
     range_start = 0
     range_end = 10000
-    default = 100
+    default = 200
 
 class CustomerCheckoutChance(Range):
-    """Percentage chance (1-100%) per checked-out customer to trigger a Customer Checkout location check.
-    Recommended: Depends on how many Customer Checkout locations you have and how long your run goes."""
+    """Percentage chance (40-100%) per checked-out customer to trigger a Customer Checkout location check.
+    Recommended: 50 (Depends on a mix of how much Location you have and how long you want to play.)"""
     display_name = "Customer Checkout Chance"
-    range_start = 1
+    range_start = 40
     range_end = 100
-    default = 5
+    default = 50
+
+class LocalCheckoutFill(Range):
+    """Percentage of Customer Checkout locations pre-filled with local filler/trap items before global multiworld placement.
+
+    Host Thresholds (enforced unless server host permits lower minimums):
+    - Up to 500 checks: minimum 55% local fill
+    - 501 to 2000 checks: minimum 90% local fill
+    - Over 2000 checks: minimum 97% local fill
+    - Maximum global multiworld checkout items: 400 max cap
+    
+    Recommended: 90"""
+    display_name = "Local Checkout Fill Percentage"
+    range_start = 0
+    range_end = 100
+    default = 90
 
 item_to_dlcs = {}
 # Required DLCs for each item
@@ -352,3 +379,4 @@ class SupermarketOptions(PerGameCommonOptions):
     free_customizables: FreeCustomizables
     customer_checkout_locations: CustomerCheckoutLocations
     customer_checkout_chance: CustomerCheckoutChance
+    local_checkout_fill: LocalCheckoutFill

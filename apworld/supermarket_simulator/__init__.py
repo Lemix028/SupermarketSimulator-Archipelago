@@ -3,6 +3,7 @@ from BaseClasses import Region, Entrance, Location, ItemClassification
 from .items import item_table, SupermarketItem, dlc_licenses
 from .locations import location_table
 from .options import SupermarketOptions
+from .settings import SupermarketSettings
 from .webhost import SupermarketSimulatorWebWorld
 from .rules import set_rules
 
@@ -27,6 +28,8 @@ class SupermarketWorld(World):
     item_name_to_id = {name: data.id for name, data in item_table.items()}
     location_name_to_id = {name: data.id for name, data in location_table.items()}
     options_dataclass = SupermarketOptions
+    settings: SupermarketSettings
+    settings_key = "supermarket_simulator_options"
 
     web = SupermarketSimulatorWebWorld()
 
@@ -155,12 +158,10 @@ class SupermarketWorld(World):
         starting.update(self.options.starting_vehicles.value)
         starting.update(self.options.starting_furniture.value)
         
-        # Guarantee at least one license to prevent softlocking at start
-        has_license = any(lic in starting for lic in self.item_name_groups["Licenses"])
-        if not has_license:
+        # Default game License
+        if not any(name.startswith("License 21") for name in starting):
             starting.add("License 21")
-            
-                
+
         return starting
 
     def get_starting_item_ids(self, option_name: str) -> list:
@@ -172,13 +173,74 @@ class SupermarketWorld(World):
                 ids.append(item_table[name].id)
         return ids
 
+    def get_filler_item_name(self) -> str:
+        disabled_traps = self.options.disabled_traps.value
+        all_traps = ["Tax Audit Trap", "Dust Storm Trap", "Power Outage Trap", "Trash Flood Trap", "Expired Products Trap", "Robbery Trap"]
+        active_traps = [trap for trap in all_traps if trap not in disabled_traps]
+
+        filler_choices = ["Money Boost", "XP Boost"]
+        filler_weights = [self.options.filler_money_weight.value, self.options.filler_xp_weight.value]
+
+        if self.options.enable_blackfriday_events:
+            filler_choices.append("Blackfriday")
+            filler_weights.append(self.options.filler_blackfriday_weight.value)
+
+        if sum(filler_weights) == 0:
+            filler_weights = [50] * len(filler_choices)
+
+        if self.options.enable_traps and active_traps and self.multiworld.random.randint(1, 100) <= self.options.trap_frequency.value:
+            return self.multiworld.random.choice(active_traps)
+        else:
+            return self.multiworld.random.choices(filler_choices, weights=filler_weights, k=1)[0]
+
     def create_items(self) -> None:
         starting_items = self.get_starting_items()
-        total_locations = len(self.multiworld.get_locations(self.player))
-        # Subtract 1 for the Victory event location which has no network address
-        total_locations -= 1
 
-        # Push all starting items to precollected using the documented API
+        total_checkouts = self.options.customer_checkout_locations.value
+        user_fill_pct = self.options.local_checkout_fill.value
+        allow_below = bool(self.settings.allow_below_local_checkout_fill_minimums)
+
+        if total_checkouts <= 0:
+            num_local_checkouts = 0
+        elif allow_below:
+            num_local_checkouts = int(round(total_checkouts * (user_fill_pct / 100.0)))
+        else:
+            local_acc = 0.0
+            # Checks 1 to 500 (min 55% local)
+            b1_count = min(total_checkouts, 500)
+            local_acc += b1_count * (max(user_fill_pct, 55) / 100.0)
+
+            # Checks 501 to 2000 (min 90% local)
+            if total_checkouts > 500:
+                b2_count = min(total_checkouts - 500, 1500)
+                local_acc += b2_count * (max(user_fill_pct, 90) / 100.0)
+
+            # Checks 2001 to 10000 (min 97% local)
+            if total_checkouts > 2000:
+                b3_count = total_checkouts - 2000
+                local_acc += b3_count * (max(user_fill_pct, 97) / 100.0)
+
+            num_local_checkouts = int(round(local_acc))
+            # Cap maximum global items at 400 unless host permits lower minimums
+            num_global_checkouts = total_checkouts - num_local_checkouts
+            if num_global_checkouts > 400:
+                num_global_checkouts = 400
+                num_local_checkouts = total_checkouts - num_global_checkouts
+
+        # Pre-fill local checkout locations with local filler items
+        if num_local_checkouts > 0:
+            for count in range(total_checkouts, total_checkouts - num_local_checkouts, -1):
+                loc_name = f"Customer Checkout {count}"
+                location = self.multiworld.get_location(loc_name, self.player)
+                filler_name = self.get_filler_item_name()
+                local_item = self.create_item(filler_name)
+                location.place_locked_item(local_item)
+
+        # Get total remaining unfilled network locations
+        unfilled_locations = [loc for loc in self.multiworld.get_locations(self.player) if loc.address is not None and not loc.item]
+        total_network_locations = len(unfilled_locations)
+
+        # Push all starting items
         for item_name in starting_items:
             self.multiworld.push_precollected(self.create_item(item_name))
 
@@ -233,13 +295,13 @@ class SupermarketWorld(World):
 
             progression_pool.append(item_name)
             
-        if len(progression_pool) > total_locations:
-            raise Exception(f"Not enough locations ({total_locations}) to fit all mandatory progression items ({len(progression_pool)}). Please increase your level/day caps or intervals.")    
+        if len(progression_pool) > total_network_locations:
+            raise Exception(f"Not enough locations ({total_network_locations}) to fit all mandatory progression items ({len(progression_pool)}). Please lower local_checkout_fill or enable allow_below_local_checkout_fill_minimums.")    
         # Shuffle pool to ensure randomization of item placement
         self.multiworld.random.shuffle(progression_pool)
 
         itempool = []
-        space_left = total_locations
+        space_left = total_network_locations
 
         # Fit as many progression items as we have location slots
         for item_name in progression_pool[:space_left]:
@@ -248,27 +310,9 @@ class SupermarketWorld(World):
 
         # Fill remaining slots with boosters and traps
         if space_left > 0:
-            disabled_traps = self.options.disabled_traps.value
-            all_traps = ["Tax Audit Trap", "Dust Storm Trap", "Power Outage Trap", "Trash Flood Trap", "Expired Products Trap", "Robbery Trap"]
-            active_traps = [trap for trap in all_traps if trap not in disabled_traps]
-
-            filler_choices = ["Money Boost", "XP Boost"]
-            filler_weights = [self.options.filler_money_weight.value, self.options.filler_xp_weight.value]
-
-            if self.options.enable_blackfriday_events:
-                filler_choices.append("Blackfriday")
-                filler_weights.append(self.options.filler_blackfriday_weight.value)
-
-            if sum(filler_weights) == 0:
-                filler_weights = [50] * len(filler_choices)
-
             for _ in range(space_left):
-                if self.options.enable_traps and active_traps and self.multiworld.random.randint(1, 100) <= self.options.trap_frequency.value:
-                    chosen_trap = self.multiworld.random.choice(active_traps)
-                    itempool.append(self.create_item(chosen_trap))
-                else:
-                    chosen_filler = self.multiworld.random.choices(filler_choices, weights=filler_weights, k=1)[0]
-                    itempool.append(self.create_item(chosen_filler))
+                chosen_filler = self.get_filler_item_name()
+                itempool.append(self.create_item(chosen_filler))
 
       
         self.multiworld.itempool.extend(itempool)
