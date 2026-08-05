@@ -42,7 +42,7 @@ class PriceRandomization(Choice):
     option_disabled = 0
     option_balanced = 1
     option_chaotic = 2
-    default = 0
+    default = 1
 
 class MaxStoreLevel(Range):
     """The maximum store level that will contain locations (checks).
@@ -119,43 +119,36 @@ class EnableLoanLocks(DefaultOnToggle):
 
 # === STARTING ITEMS CONFIGURATIONS ===
 
-class StartingLicenses(OptionList):
-    """List of product licenses you want to start the game with (e.g., 'License 21'). License 21 needs to be included currently because the game sets it as a starting license.
+class StartingLicenses(OptionSet):
+    """Set of product licenses you want to start the game with (e.g., 'License 21'). License 21 needs to be included currently because the game sets it as a starting license.
     Recommended: Default except if you want to start with more licenses."""
     display_name = "Starting Licenses"
-    default = ["License 21"]
+    valid_keys = set(ALL_LICENSES)
+    default = {"License 21"}
 
     def verify(self, world, player_name, plando_options):
+        active_dlcs = getattr(world.options, "active_dlcs", None)
+        active_dlc_keys = active_dlcs.value if active_dlcs else set()
         for item in self.value:
-            if item not in ALL_LICENSES:
-                raise ValueError(f"'{item}' is not a valid license name in {player_name}'s slot.")
+            for dlc_key, dlc_items in dlc_licenses.items():
+                if item in dlc_items and dlc_key not in active_dlc_keys:
+                    raise ValueError(f"Starting license '{item}' requires DLC '{dlc_key}', which is not enabled in active_dlcs for {player_name}'s slot.")
         super().verify(world, player_name, plando_options)
 
-class StartingVehicles(OptionList):
-    """List of vehicles you want to start the game with (e.g., 'Skateboard').
+class StartingVehicles(OptionSet):
+    """Set of vehicles you want to start the game with (e.g., 'Skateboard').
        Recommended: None except if you want to start easy."""
     display_name = "Starting Vehicles"
-    default = []
+    valid_keys = set(ALL_VEHICLES)
+    default = set()
 
-    def verify(self, world, player_name, plando_options):
-        for item in self.value:
-            if item not in ALL_VEHICLES:
-                raise ValueError(f"'{item}' is not a valid vehicle name in {player_name}'s slot.")
-        super().verify(world, player_name, plando_options)
-
-class StartingFurniture(OptionList):
-    """List of furniture items you want to start the game with.
+class StartingFurniture(OptionSet):
+    """Set of furniture items you want to start the game with.
        Default game starts with two normal shelves and a checkout counter.
-       Some DLCs furniture listed here may not be available if the DLC is not enabled.
-       Recommended: None except you like to have basic furniture to begin like half shelf and mini fridge."""
+       Recommended: None except if you like to have basic furniture to begin like half shelf and mini fridge."""
     display_name = "Starting Furniture"
-    default = []
-
-    def verify(self, world, player_name, plando_options):
-        for item in self.value:
-            if item not in ALL_FURNITURE:
-                raise ValueError(f"'{item}' is not a valid furniture name in {player_name}'s slot.")
-        super().verify(world, player_name, plando_options)
+    valid_keys = set(ALL_FURNITURE)
+    default = set()
 
 # === TRAPS & FILLERS ===
 
@@ -172,17 +165,12 @@ class TrapFrequency(Range):
     range_end = 100
     default = 20
 
-class DisabledTraps(OptionList):
-    """List of traps that should be excluded from generation.
+class DisabledTraps(OptionSet):
+    """Set of traps that should be excluded from generation.
     Recommended: None unless you want to avoid specific traps."""
     display_name = "Disabled Traps"
-    default = []
-
-    def verify(self, world, player_name, plando_options):
-        for item in self.value:
-            if item not in ALL_TRAPS:
-                raise ValueError(f"'{item}' is not a valid trap name in {player_name}'s slot.")
-        super().verify(world, player_name, plando_options)
+    valid_keys = set(ALL_TRAPS)
+    default = set()
 
 class FillerMoneyWeight(Range):
     """Generation weight for money boosters.
@@ -201,14 +189,14 @@ class FillerXPWeight(Range):
     default = 50
 
 class EnableBlackfridayEvents(DefaultOnToggle):
-    """If enabled, Blackfriday events can be generated as fillers.
+    """If enabled, Black Friday events can be generated as fillers.
     Recommended: Enabled"""
-    display_name = "Enable Blackfriday Events"
+    display_name = "Enable Black Friday Events"
 
 class FillerBlackfridayWeight(Range):
-    """Generation weight for Blackfriday events.
+    """Generation weight for Black Friday events.
     Recommended: 10"""
-    display_name = "Filler Blackfriday Weight"
+    display_name = "Filler Black Friday Weight"
     range_start = 0
     range_end = 100
     default = 10
@@ -236,6 +224,12 @@ class MoneyMilestoneInterval(Range):
     default = 5000
     step = 1000
 
+    def verify(self, world, player_name, plando_options):
+        max_money = getattr(world.options, "max_money_milestone", None)
+        if max_money and self.value > max_money.value:
+            self.value = max_money.value
+        super().verify(world, player_name, plando_options)
+
 class VendingMachineSlots(Range):
     """The number of Vending Machine Slot licenses placed in the item pool.
     Each item allows buying an additional vending machine slot in the computer.
@@ -253,6 +247,28 @@ class ExcludeLicenses(OptionSet):
     display_name = "Exclude Licenses"
     valid_keys = set(ALL_LICENSES)
     default = set()
+
+    def verify(self, world, player_name, plando_options):
+        active_dlcs = getattr(world.options, "active_dlcs", None)
+        active_dlc_keys = active_dlcs.value if active_dlcs else set()
+        active_licenses = set()
+        for item_name in ALL_LICENSES:
+            is_dlc = False
+            for dlc_key, licenses_dict in dlc_licenses.items():
+                if item_name in licenses_dict:
+                    is_dlc = True
+                    if dlc_key in active_dlc_keys:
+                        active_licenses.add(item_name)
+                    break
+            if not is_dlc:
+                active_licenses.add(item_name)
+
+        goal = getattr(world.options, "goal", None)
+        if goal and goal.value == 2:  # option_all_licenses
+            remaining = active_licenses - self.value
+            if not remaining:
+                raise ValueError(f"All active product licenses are excluded for {player_name}'s slot while Goal is set to 'All Licenses'.")
+        super().verify(world, player_name, plando_options)
 
 class CheckoutIncomeMultiplier(Range):
     """Multiplies the payout received at the cash register/self-checkout when customers pay.
