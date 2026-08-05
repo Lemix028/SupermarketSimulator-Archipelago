@@ -61,7 +61,8 @@ class StoreLevelInterval(Range):
     default = 1
 
     def verify(self, world, player_name, plando_options):
-        max_lvl = getattr(world.options, "max_store_level", None)
+        world_options = getattr(world, "options", None) if world else None
+        max_lvl = getattr(world_options, "max_store_level", None) if world_options else None
         if max_lvl and self.value > max_lvl.value:
             self.value = max_lvl.value
         super().verify(world, player_name, plando_options)
@@ -83,7 +84,8 @@ class DaysCompletedInterval(Range):
     default = 1
 
     def verify(self, world, player_name, plando_options):
-        max_days = getattr(world.options, "max_days_completed", None)
+        world_options = getattr(world, "options", None) if world else None
+        max_days = getattr(world_options, "max_days_completed", None) if world_options else None
         if max_days and self.value > max_days.value:
             self.value = max_days.value
         super().verify(world, player_name, plando_options)
@@ -127,7 +129,8 @@ class StartingLicenses(OptionSet):
     default = {"License 21"}
 
     def verify(self, world, player_name, plando_options):
-        active_dlcs = getattr(world.options, "active_dlcs", None) if world and hasattr(world, "options") else None
+        world_options = getattr(world, "options", None) if world else None
+        active_dlcs = getattr(world_options, "active_dlcs", None) if world_options else None
         active_dlc_keys = active_dlcs.value if active_dlcs else set()
         for item in self.value:
             for dlc_key, dlc_items in dlc_licenses.items():
@@ -225,7 +228,8 @@ class MoneyMilestoneInterval(Range):
     step = 1000
 
     def verify(self, world, player_name, plando_options):
-        max_money = getattr(world.options, "max_money_milestone", None)
+        world_options = getattr(world, "options", None) if world else None
+        max_money = getattr(world_options, "max_money_milestone", None) if world_options else None
         if max_money and self.value > max_money.value:
             self.value = max_money.value
         super().verify(world, player_name, plando_options)
@@ -249,7 +253,8 @@ class ExcludeLicenses(OptionSet):
     default = set()
 
     def verify(self, world, player_name, plando_options):
-        active_dlcs = getattr(world.options, "active_dlcs", None) if world and hasattr(world, "options") else None
+        world_options = getattr(world, "options", None) if world else None
+        active_dlcs = getattr(world_options, "active_dlcs", None) if world_options else None
         active_dlc_keys = active_dlcs.value if active_dlcs else set()
         active_licenses = set()
         for item_name in ALL_LICENSES:
@@ -263,7 +268,7 @@ class ExcludeLicenses(OptionSet):
             if not is_dlc:
                 active_licenses.add(item_name)
 
-        goal = getattr(world.options, "goal", None) if world and hasattr(world, "options") else None
+        goal = getattr(world_options, "goal", None) if world_options else None
         if goal and goal.value == 2:  # option_all_licenses
             remaining = active_licenses - self.value
             if not remaining:
@@ -321,11 +326,11 @@ class LocalCheckoutFill(Range):
     - Over 2000 checks: minimum 97% local fill
     - Maximum global multiworld checkout items: 400 max cap
     
-    Recommended: 90"""
+    Recommended: 60"""
     display_name = "Local Checkout Fill Percentage"
     range_start = 0
     range_end = 100
-    default = 90
+    default = 60
 
 item_to_dlcs = {}
 # Required DLCs for each item
