@@ -158,9 +158,8 @@ class SupermarketWorld(World):
         starting.update(self.options.starting_vehicles.value)
         starting.update(self.options.starting_furniture.value)
         
-        # Default game License
-        if not any(name.startswith("License 21") for name in starting):
-            starting.add("License 21")
+        # License 21 is the default game license and is always included
+        starting.add("License 21")
 
         return starting
 

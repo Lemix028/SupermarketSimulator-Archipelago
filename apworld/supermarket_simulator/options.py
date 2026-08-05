@@ -127,7 +127,7 @@ class StartingLicenses(OptionSet):
     default = {"License 21"}
 
     def verify(self, world, player_name, plando_options):
-        active_dlcs = getattr(world.options, "active_dlcs", None)
+        active_dlcs = getattr(world.options, "active_dlcs", None) if world and hasattr(world, "options") else None
         active_dlc_keys = active_dlcs.value if active_dlcs else set()
         for item in self.value:
             for dlc_key, dlc_items in dlc_licenses.items():
@@ -249,7 +249,7 @@ class ExcludeLicenses(OptionSet):
     default = set()
 
     def verify(self, world, player_name, plando_options):
-        active_dlcs = getattr(world.options, "active_dlcs", None)
+        active_dlcs = getattr(world.options, "active_dlcs", None) if world and hasattr(world, "options") else None
         active_dlc_keys = active_dlcs.value if active_dlcs else set()
         active_licenses = set()
         for item_name in ALL_LICENSES:
@@ -263,7 +263,7 @@ class ExcludeLicenses(OptionSet):
             if not is_dlc:
                 active_licenses.add(item_name)
 
-        goal = getattr(world.options, "goal", None)
+        goal = getattr(world.options, "goal", None) if world and hasattr(world, "options") else None
         if goal and goal.value == 2:  # option_all_licenses
             remaining = active_licenses - self.value
             if not remaining:

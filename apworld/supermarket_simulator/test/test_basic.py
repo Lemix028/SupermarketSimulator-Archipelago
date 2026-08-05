@@ -251,15 +251,15 @@ class TestSupermarketSimulatorAllLicensesGoalVictory(SupermarketSimulatorTestBas
 
 class TestSupermarketSimulatorSafetyNetNotTriggered(SupermarketSimulatorTestBase):
     options = {
-        "starting_licenses": ["License 22"],
+        "starting_licenses": {"License 22"},
     }
 
     def test_safety_net_not_triggered(self) -> None:
         self.world_setup()
         precollected_names = [item.name for item in self.multiworld.precollected_items[self.player]]
         self.assertIn("License 22", precollected_names)
-        # License 21 should NOT be injected as we already start with License 22
-        self.assertNotIn("License 21", precollected_names)
+        # License 21 is the default game starting license and is always included
+        self.assertIn("License 21", precollected_names)
 
 
 class TestSupermarketSimulatorDynamicSlotData(SupermarketSimulatorTestBase):
@@ -405,4 +405,49 @@ class TestSupermarketSimulatorLocationRules(SupermarketSimulatorTestBase):
         self.assertTrue(self.can_reach("Customer Checkout 1"))
         checkout_2_loc = self.multiworld.get_location("Customer Checkout 2", self.player)
         self.assertTrue(checkout_2_loc.can_reach(self.multiworld.state))
+
+
+class TestSupermarketSimulatorCustomerCheckoutFill(SupermarketSimulatorTestBase):
+    options = {
+        "customer_checkout_locations": 200,
+        "local_checkout_fill": 90,
+    }
+
+    def test_checkout_fill_prefills_locations(self) -> None:
+        self.world_setup()
+        checkout_locations = [loc for loc in self.multiworld.get_locations(self.player) if loc.name.startswith("Customer Checkout ")]
+        self.assertEqual(len(checkout_locations), 200)
+
+        # 90% of 200 = 180 locations pre-filled locally, 20 remaining for global pool
+        prefilled = [loc for loc in checkout_locations if loc.item is not None]
+        unfilled = [loc for loc in checkout_locations if loc.item is None]
+        self.assertEqual(len(prefilled), 180)
+        self.assertEqual(len(unfilled), 20)
+
+
+class TestSupermarketSimulatorZeroCheckouts(SupermarketSimulatorTestBase):
+    options = {
+        "customer_checkout_locations": 0,
+    }
+
+    def test_zero_checkouts_generation(self) -> None:
+        self.world_setup()
+        checkout_locations = [loc for loc in self.multiworld.get_locations(self.player) if loc.name.startswith("Customer Checkout ")]
+        self.assertEqual(len(checkout_locations), 0)
+
+
+class TestSupermarketSimulatorFullLocalFill(SupermarketSimulatorTestBase):
+    options = {
+        "customer_checkout_locations": 100,
+        "local_checkout_fill": 100,
+    }
+
+    def test_full_local_fill(self) -> None:
+        self.world_setup()
+        checkout_locations = [loc for loc in self.multiworld.get_locations(self.player) if loc.name.startswith("Customer Checkout ")]
+        self.assertEqual(len(checkout_locations), 100)
+        prefilled = [loc for loc in checkout_locations if loc.item is not None]
+        unfilled = [loc for loc in checkout_locations if loc.item is None]
+        self.assertEqual(len(prefilled), 100)
+        self.assertEqual(len(unfilled), 0)
 
