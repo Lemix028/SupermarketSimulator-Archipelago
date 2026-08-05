@@ -69,10 +69,10 @@ class StoreLevelInterval(Range):
 
 class MaxDaysCompleted(Range):
     """The maximum number of completed days that contain checks.
-        Recommended: Depends how long you want to play."""
+    Recommended: 100"""
     display_name = "Max Days Completed"
     range_start = 5
-    range_end = 1000
+    range_end = 200
     default = 100
 
 class DaysCompletedInterval(Range):
