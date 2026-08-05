@@ -425,6 +425,23 @@ class TestSupermarketSimulatorCustomerCheckoutFill(SupermarketSimulatorTestBase)
         self.assertEqual(len(unfilled), 20)
 
 
+class TestSupermarketSimulatorDefaultLocalFill(SupermarketSimulatorTestBase):
+    options = {
+        "customer_checkout_locations": 200,
+    }
+
+    def test_default_checkout_fill(self) -> None:
+        self.world_setup()
+        checkout_locations = [loc for loc in self.multiworld.get_locations(self.player) if loc.name.startswith("Customer Checkout ")]
+        self.assertEqual(len(checkout_locations), 200)
+
+        # Default 60% of 200 = 120 locations pre-filled locally, 80 remaining for global pool
+        prefilled = [loc for loc in checkout_locations if loc.item is not None]
+        unfilled = [loc for loc in checkout_locations if loc.item is None]
+        self.assertEqual(len(prefilled), 120)
+        self.assertEqual(len(unfilled), 80)
+
+
 class TestSupermarketSimulatorZeroCheckouts(SupermarketSimulatorTestBase):
     options = {
         "customer_checkout_locations": 0,
