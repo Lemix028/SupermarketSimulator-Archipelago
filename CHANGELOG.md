@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.3.1] - Unreleased
+
+### APWorld (Python)
+
+#### Added
+- Local Checkout Fill Option: Added `local_checkout_fill` YAML option (0–100%, default 60%) to pre-fill customer checkout locations with local filler/trap items.
+- Server Protection & Safety Thresholds: Enforced dynamic local fill thresholds and capped maximum global multiworld checkout items at 400.
+- Host Setting: Added `allow_below_local_checkout_fill_minimums` host setting in `settings.py` for `host.yaml` to allow hosts to bypass minimums.
+
+#### Changed
+- Checkout Chance Minimum: Increased minimum `customer_checkout_chance` from 1% to 40% (default 50%), to prevent unbeatable seeds.
+- OptionSet Conversion: Converted `StartingLicenses`, `StartingFurniture`, `StartingVehicles`, and `DisabledTraps` to `OptionSet` to automatically prevent duplicate entries.
+- Starting License: `License 21` is unconditionally included as the default starting license.
+- Max Days Capped: Capped `MaxDaysCompleted` at 200 days maximum, to prevent unbeatable seeds.
+
+#### Fixed
+- Interval Verification: Capped milestone and level intervals at their respective maximum bounds.
+
 ## [0.3.0] - 03.08.2026
 
 ### APWorld (Python)
