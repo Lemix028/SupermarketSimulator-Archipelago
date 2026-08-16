@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.3.2] - 16.08.2026
+
+### APWorld (Python)
+
+#### Changed
+- Progressive Room Upgrade Items: Replaced the individually numbered section and storage unlock items with 32 copies of `Progressive Section Room Upgrade` and 20 copies of `Progressive Storage Room Upgrade`.
+
+#### Fixed
+- Universal Tracker Room Order: Fixed section and storage room upgrades appearing reachable in the wrong order.
+- Missing Section Item: Added the 32nd progressive section unlock required for `Section Room Upgrade 32`.
+
+### Client Mod (C# / BepInEx 6 IL2CPP)
+
+#### Fixed
+- Money Boost Checkout Checks: Fixed Money Boost filler items triggering Checkout locations or being affected by the checkout income multiplier.
+- Deferred Item History: Fixed consumable fillers and traps received in the main menu replaying after reconnecting.
+- Slot Isolation: Fixed pending items and cached location data carrying over between AP slots.
+
 ## [0.3.1] - 06.08.2026
 
 ### APWorld (Python)
