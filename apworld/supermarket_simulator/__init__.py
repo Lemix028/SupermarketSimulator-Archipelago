@@ -1,6 +1,14 @@
 from worlds.AutoWorld import World
 from BaseClasses import Region, Entrance, Location, ItemClassification
-from .items import item_table, SupermarketItem, dlc_licenses
+from .items import (
+    item_table,
+    SupermarketItem,
+    dlc_licenses,
+    PROGRESSIVE_SECTION_ITEM,
+    PROGRESSIVE_STORAGE_ITEM,
+    SECTION_UPGRADE_COUNT,
+    STORAGE_UPGRADE_COUNT,
+)
 from .locations import location_table
 from .options import SupermarketOptions
 from .settings import SupermarketSettings
@@ -35,7 +43,7 @@ class SupermarketWorld(World):
 
     item_name_groups = {
         "Licenses": {name for name in item_table if name.startswith("License ")},
-        "Sections": {name for name in item_table if name.startswith("Section ")},
+        "Sections": {PROGRESSIVE_SECTION_ITEM},
         "Furniture": {
             "Normal Shelf", "Single Shelf", "Half Shelf", "Shelf Inner Corner", "Shelf Outer Corner",
             "Shelf Quad", "Shelf Quad Half", "Fridge Single", "Double Fridge", "Fridge Mini",
@@ -47,7 +55,7 @@ class SupermarketWorld(World):
         "Vehicles": {
             "Skateboard", "Bicycle", "Scooter", "Sedan", "Pickup Truck"
         },
-        "Storage": {f"Storage Room Upgrade {i}" for i in range(1, 21)},
+        "Storage": {PROGRESSIVE_STORAGE_ITEM},
         "Loans": {f"Loan Authorization {i}" for i in range(1, 7)}
     }
 
@@ -247,6 +255,13 @@ class SupermarketWorld(World):
         progression_pool = []
         active_dlcs = self.options.active_dlcs.value
 
+        progression_pool.extend([PROGRESSIVE_SECTION_ITEM] * SECTION_UPGRADE_COUNT)
+        if self.options.enable_storage_locks.value:
+            progression_pool.extend([PROGRESSIVE_STORAGE_ITEM] * STORAGE_UPGRADE_COUNT)
+        else:
+            for _ in range(STORAGE_UPGRADE_COUNT):
+                self.multiworld.push_precollected(self.create_item(PROGRESSIVE_STORAGE_ITEM))
+
         if "dlc_vending" in active_dlcs:
             vending_slots_count = self.options.vending_machine_slots.value
             for _ in range(vending_slots_count):
@@ -260,6 +275,9 @@ class SupermarketWorld(World):
                 continue
 
             if item_name == "Vending Machine Slot":
+                continue
+
+            if item_name in (PROGRESSIVE_SECTION_ITEM, PROGRESSIVE_STORAGE_ITEM):
                 continue
 
             # DLC Handling
@@ -283,9 +301,6 @@ class SupermarketWorld(World):
                 self.multiworld.push_precollected(self.create_item(item_name))
                 continue
             if item_name in self.item_name_groups["Furniture"] and not self.options.enable_furniture_locks.value:
-                self.multiworld.push_precollected(self.create_item(item_name))
-                continue
-            if item_name in self.item_name_groups["Storage"] and not self.options.enable_storage_locks.value:
                 self.multiworld.push_precollected(self.create_item(item_name))
                 continue
             if item_name in self.item_name_groups["Loans"] and not self.options.enable_loan_locks.value:

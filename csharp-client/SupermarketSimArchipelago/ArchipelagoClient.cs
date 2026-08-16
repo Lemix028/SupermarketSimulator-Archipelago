@@ -8,6 +8,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using static Archipelago.MultiClient.Net.Helpers.ArchipelagoSocketHelperDelagates;
@@ -34,6 +35,7 @@ namespace SupermarketArchipelago
 
         // Receiving Items
         private static ConcurrentQueue<ItemInfo> _pendingItems = new ConcurrentQueue<ItemInfo>();
+        private static int _sessionGeneration;
         public static bool IsStoreReady = false;
 
         public static void Initialize(ManualLogSource logger)
@@ -54,6 +56,9 @@ namespace SupermarketArchipelago
             try
             {
                 _log.LogInfo($"Attempting to connect to {serverUrl} as slot '{slotName}'...");
+
+                ResetInMemorySessionState();
+                ArchipelagoHistoryManager.PrepareForSession();
 
                 // Create session using standard .NET sockets
                 _session = ArchipelagoSessionFactory.CreateSession(serverUrl);
@@ -137,9 +142,7 @@ namespace SupermarketArchipelago
                     _log?.LogWarning($"Ignored socket disconnect exception: {ex.Message}");
                 }
 
-                ReceivedItemIDs.Clear();
-                ArchipelagoPriceManager.ClearRegistry();
-                GoalHandler.Reset();
+                ResetInMemorySessionState();
 
                 _session = null;
                 _log?.LogWarning("Session disconnected and cleared.");
@@ -147,6 +150,20 @@ namespace SupermarketArchipelago
             UnityMainThreadDispatcher.Enqueue(() => {
                 MainMenuPatch.RefreshButtonText();
             });
+        }
+
+        private static void ResetInMemorySessionState()
+        {
+            Interlocked.Increment(ref _sessionGeneration);
+
+            ReceivedItemIDs.Clear();
+            SentLocationIDs.Clear();
+            ScoutedLocationsCache.Clear();
+
+            while (_pendingItems.TryDequeue(out _)) { }
+
+            ArchipelagoPriceManager.ClearRegistry();
+            GoalHandler.Reset();
         }
 
         /// <summary>
@@ -260,9 +277,13 @@ namespace SupermarketArchipelago
         /// </summary>
         public static void ProcessReceivedItem(ItemInfo item, bool setHistory = false)
         {
+            int sessionGeneration = Volatile.Read(ref _sessionGeneration);
 
             UnityMainThreadDispatcher.Enqueue(() =>
             {
+                if (sessionGeneration != Volatile.Read(ref _sessionGeneration))
+                    return;
+
                 int apItemID = (int)item.ItemId;
                 ApItemType type = ArchipelagoIdHelper.GetItemType(apItemID);
                 int gameID = ArchipelagoIdHelper.ToGameID(apItemID);
@@ -308,7 +329,7 @@ namespace SupermarketArchipelago
             {
                 while (_pendingItems.TryDequeue(out var item))
                 {
-                    ProcessReceivedItem(item);
+                    ProcessReceivedItem(item, true);
                 }
 
                 GoalHandler.CheckCurrentProgress();
@@ -328,8 +349,7 @@ namespace SupermarketArchipelago
 
         public static bool CheckIncomingSection(int gameID)
         {
-            int apID = gameID + ArchipelagoIdHelper.SectionBaseID;
-            return ReceivedItemIDs.Any(x => x.ItemId == apID);
+            return GetReceivedSectionCount() >= gameID;
         }
 
         public static bool CheckIncomingCashier(int gameID)

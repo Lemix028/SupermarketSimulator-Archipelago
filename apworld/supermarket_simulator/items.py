@@ -8,6 +8,11 @@ class ItemData(NamedTuple):
 class SupermarketItem(Item):
     game: str = "Supermarket Simulator"
 
+PROGRESSIVE_SECTION_ITEM = "Progressive Section Room Upgrade"
+PROGRESSIVE_STORAGE_ITEM = "Progressive Storage Room Upgrade"
+SECTION_UPGRADE_COUNT = 32
+STORAGE_UPGRADE_COUNT = 20
+
 item_table = {
     # === LICENSES (Offset 100+) ===
     "License 21": ItemData(121, ItemClassification.progression),
@@ -43,7 +48,7 @@ item_table = {
 
     
     # === SECTIONS (Offset 200+) ===
-    **{f"Section {i}": ItemData(200 + i, ItemClassification.progression) for i in range(1, 32)},
+    PROGRESSIVE_SECTION_ITEM: ItemData(201, ItemClassification.progression),
 
     # === STAFF (Offset 300+) ===
     "Cashier 1": ItemData(301, ItemClassification.progression),
@@ -112,7 +117,7 @@ item_table = {
     "Robbery Trap": ItemData(706, ItemClassification.trap),
 
     # === STORAGE ROOM UPGRADES (Offset 800+) ===
-    **{f"Storage Room Upgrade {i}": ItemData(800 + i, ItemClassification.progression) for i in range(1, 21)},
+    PROGRESSIVE_STORAGE_ITEM: ItemData(801, ItemClassification.progression),
 
     # === LOAN AUTHORIZATIONS (Offset 850+) ===
     **{f"Loan Authorization {i}": ItemData(850 + i, ItemClassification.useful) for i in range(1, 7)},

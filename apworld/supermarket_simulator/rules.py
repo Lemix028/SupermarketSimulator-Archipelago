@@ -1,5 +1,6 @@
 from worlds.generic.Rules import set_rule, add_rule
 from BaseClasses import CollectionState
+from .items import PROGRESSIVE_SECTION_ITEM, PROGRESSIVE_STORAGE_ITEM
 
 
 def set_rules(self) -> None:
@@ -7,8 +8,8 @@ def set_rules(self) -> None:
     Sets location access rules and Victory completion condition.
 
     Item Requirements:
-      - Storage Room Upgrade N requires Storage Room Upgrade N item (if locked)
-      - Section Room Upgrade N requires Section N item (if locked)
+      - Storage Room Upgrade N requires N received storage upgrade items (if locked)
+      - Section Room Upgrade N requires N received section items
       - Purchase License X requires License X item
 
     Goals:
@@ -26,8 +27,12 @@ def set_rules(self) -> None:
         ]
         for loc in storage_locs:
             upgrade_num = int(loc.name.split()[-1])
-            item_name = f"Storage Room Upgrade {upgrade_num}"
-            set_rule(loc, lambda state, item=item_name: state.has(item, player))
+            set_rule(
+                loc,
+                lambda state, required=upgrade_num: state.has(
+                    PROGRESSIVE_STORAGE_ITEM, player, required
+                ),
+            )
 
     # 2. Section Room Upgrade Item Rules
     if self.options.enable_section_locations.value:
@@ -37,9 +42,12 @@ def set_rules(self) -> None:
         ]
         for loc in section_locs:
             upgrade_num = int(loc.name.split()[-1])
-            if upgrade_num <= 31:
-                item_name = f"Section {upgrade_num}"
-                set_rule(loc, lambda state, item=item_name: state.has(item, player))
+            set_rule(
+                loc,
+                lambda state, required=upgrade_num: state.has(
+                    PROGRESSIVE_SECTION_ITEM, player, required
+                ),
+            )
 
     # 3. License Purchase Location Rules (Requires having the License item)
     purchase_license_locs = [

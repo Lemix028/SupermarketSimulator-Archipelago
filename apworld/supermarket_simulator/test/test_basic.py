@@ -2,6 +2,7 @@ import unittest
 from test.bases import WorldTestBase
 from BaseClasses import ItemClassification
 from worlds.supermarket_simulator.options import StartingLicenses, DisabledTraps, StartingFurniture
+from worlds.supermarket_simulator.items import PROGRESSIVE_SECTION_ITEM, PROGRESSIVE_STORAGE_ITEM
 from Fill import distribute_items_restrictive
 
 class SupermarketSimulatorTestBase(WorldTestBase):
@@ -385,10 +386,10 @@ class TestSupermarketSimulatorLocationRules(SupermarketSimulatorTestBase):
         earn_2000_loc = self.multiworld.get_location("Earn 2000$", self.player)
         self.assertTrue(earn_2000_loc.can_reach(self.multiworld.state))
 
-        # Storage Room Upgrade 1 requires Storage Room Upgrade 1 item
+        # Storage Room Upgrade 1 requires one received storage upgrade item
         storage_1_loc = self.multiworld.get_location("Storage Room Upgrade 1", self.player)
         self.assertFalse(storage_1_loc.can_reach(self.multiworld.state))
-        self.collect_by_name("Storage Room Upgrade 1")
+        self.collect(self.get_items_by_name(PROGRESSIVE_STORAGE_ITEM)[0])
         self.assertTrue(storage_1_loc.can_reach(self.multiworld.state))
 
         # Starting license (License 21) should NOT generate a Purchase License 21 location
@@ -405,6 +406,36 @@ class TestSupermarketSimulatorLocationRules(SupermarketSimulatorTestBase):
         self.assertTrue(self.can_reach("Customer Checkout 1"))
         checkout_2_loc = self.multiworld.get_location("Customer Checkout 2", self.player)
         self.assertTrue(checkout_2_loc.can_reach(self.multiworld.state))
+
+    def test_room_upgrades_follow_received_item_counts(self) -> None:
+        self.world_setup()
+
+        storage_1 = self.multiworld.get_location("Storage Room Upgrade 1", self.player)
+        storage_2 = self.multiworld.get_location("Storage Room Upgrade 2", self.player)
+        storage_items = self.get_items_by_name(PROGRESSIVE_STORAGE_ITEM)
+        self.assertEqual(len(storage_items), 20)
+        self.collect(storage_items[0])
+        self.assertTrue(storage_1.can_reach(self.multiworld.state))
+        self.assertFalse(storage_2.can_reach(self.multiworld.state))
+        self.collect(storage_items[1])
+        self.assertTrue(storage_2.can_reach(self.multiworld.state))
+
+        section_1 = self.multiworld.get_location("Section Room Upgrade 1", self.player)
+        section_2 = self.multiworld.get_location("Section Room Upgrade 2", self.player)
+        section_32 = self.multiworld.get_location("Section Room Upgrade 32", self.player)
+        section_items = self.get_items_by_name(PROGRESSIVE_SECTION_ITEM)
+        self.assertEqual(len(section_items), 32)
+        self.collect(section_items[0])
+        self.assertTrue(section_1.can_reach(self.multiworld.state))
+        self.assertFalse(section_2.can_reach(self.multiworld.state))
+        self.assertFalse(section_32.can_reach(self.multiworld.state))
+        self.collect(section_items[1])
+        self.assertTrue(section_2.can_reach(self.multiworld.state))
+
+        self.collect(section_items[2:31])
+        self.assertFalse(section_32.can_reach(self.multiworld.state))
+        self.collect(section_items[31])
+        self.assertTrue(section_32.can_reach(self.multiworld.state))
 
 
 class TestSupermarketSimulatorCustomerCheckoutFill(SupermarketSimulatorTestBase):
@@ -467,4 +498,4 @@ class TestSupermarketSimulatorFullLocalFill(SupermarketSimulatorTestBase):
         unfilled = [loc for loc in checkout_locations if loc.item is None]
         self.assertEqual(len(prefilled), 100)
         self.assertEqual(len(unfilled), 0)
-
+

@@ -14,6 +14,12 @@ namespace SupermarketArchipelago
         private static string _currentHistoryPath;
         
 
+        public static void PrepareForSession()
+        {
+            _initEvent.Reset();
+        }
+
+
         public static void Init(string slotName, string seed)
         {
             _initEvent.Reset();
