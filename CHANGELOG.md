@@ -1,8 +1,15 @@
 # Changelog
 
+## [0.3.3] - 23.08.2026
+
+### APWorld
+
+#### Changed
+- Progressive Employee Upgrade Items: Replaced individually numbered employee unlock items with progressive copies.
+
 ## [0.3.2] - 16.08.2026
 
-### APWorld (Python)
+### APWorld
 
 #### Changed
 - Progressive Room Upgrade Items: Replaced the individually numbered section and storage unlock items with 32 copies of `Progressive Section Room Upgrade` and 20 copies of `Progressive Storage Room Upgrade`.
@@ -11,7 +18,7 @@
 - Universal Tracker Room Order: Fixed section and storage room upgrades appearing reachable in the wrong order.
 - Missing Section Item: Added the 32nd progressive section unlock required for `Section Room Upgrade 32`.
 
-### Client Mod (C# / BepInEx 6 IL2CPP)
+### Client Mod
 
 #### Fixed
 - Money Boost Checkout Checks: Fixed Money Boost filler items triggering Checkout locations or being affected by the checkout income multiplier.
@@ -20,7 +27,7 @@
 
 ## [0.3.1] - 06.08.2026
 
-### APWorld (Python)
+### APWorld
 
 #### Added
 - Local Checkout Fill Option: Added `local_checkout_fill` YAML option (0–100%, default 60%) to pre-fill customer checkout locations with local filler/trap items.
@@ -38,7 +45,7 @@
 
 ## [0.3.0] - 03.08.2026
 
-### APWorld (Python)
+### APWorld
 
 #### Added
 - License Purchase Location Checks: Purchasing a received product license at the in-game computer now acts as a location check (`Purchase License X`). Starting licenses and excluded licenses do not generate purchase checks.
@@ -56,7 +63,7 @@
 - Universal Tracker Crash (ZeroDivisionError): Populated `location_name_groups` with all location categories and corrected `Store Level` range starting at Level 2.
 - Section Upgrade Unlocks: Prevented section upgrades from becoming unlocked while section locations are disabled.
 
-### Client Mod (C# / BepInEx 6 IL2CPP)
+### Client Mod
 
 #### Added
 - Power Outage Manager: `PowerOutageManager.cs` to handle store light dimming and 60-second restoration in Unity's `Update()` loop.
@@ -75,7 +82,7 @@
 
 ## [0.2.1] - 2026-07-19 — Initial Public Release
 
-### APWorld (Python)
+### APWorld
 
 #### Added
 - Exclude Licenses Option: Added `exclude_licenses` setting to exclude specified product licenses by name in YAML from the "All Licenses" victory goal. Excluded licenses are dynamically categorized as `useful` items instead of `progression` items.
@@ -83,7 +90,7 @@
 - Free Customizables Option: Added `free_customizables` toggle option to make all visual upgrades free.
 - Checkout Income Multiplier Option: Added `checkout_income_multiplier` setting to multiply customer payments at checkout registers (range: 10% to 1000%, default: 100%).
 
-### Client Mod (C# / BepInEx 6 IL2CPP)
+### Client Mod
 
 #### Added
 - Free Customizables Support: Implemented memory mutation and UI hooks to make wall paint, floor tiles, store rename, door placement, and entrance upgrades cost $0 when the option is enabled.
@@ -98,7 +105,7 @@
 
 ## [0.2.0] - 2026-07-18 
 
-### APWorld (Python)
+### APWorld
 
 #### Added
 - Initial public release of the Supermarket Simulator APWorld.
@@ -118,7 +125,7 @@
 - Three preset configurations on the options page: **Easy**, **Normal**, **Hard**.
 - Proper Victory event item/location system with per-goal access rules.
 
-### Client Mod (C# / BepInEx 6 IL2CPP)
+### Client Mod
 
 #### Added
 - Initial public release of the BepInEx 6 (IL2CPP) client mod.
