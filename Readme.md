@@ -2,7 +2,7 @@
 # Supermarket Simulator - Archipelago Multiworld Client Mod
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Game Version](https://img.shields.io/badge/Game%20Version-1.5.3-blue.svg)](https://store.steampowered.com/app/2670630/Supermarket_Simulator/)
+[![Game Version](https://img.shields.io/badge/Game%20Version-1.6.0-blue.svg)](https://store.steampowered.com/app/2670630/Supermarket_Simulator/)
 [![Framework](https://img.shields.io/badge/Framework-BepInEx%206%20(IL2CPP)-orange.svg)](https://github.com/BepInEx/BepInEx)
 
 [Troubleshooting FAQ](Troubleshooting.md) | [Report a Bug](https://github.com/Lemix028/SupermarketSimulator-Archipelago/issues)
