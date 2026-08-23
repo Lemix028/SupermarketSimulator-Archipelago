@@ -8,6 +8,8 @@ from .items import (
     PROGRESSIVE_STORAGE_ITEM,
     SECTION_UPGRADE_COUNT,
     STORAGE_UPGRADE_COUNT,
+    PROGRESSIVE_STAFF_COUNTS,
+    PROGRESSIVE_DLC_STAFF_COUNTS,
 )
 from .locations import location_table
 from .options import SupermarketOptions
@@ -56,6 +58,9 @@ class SupermarketWorld(World):
             "Skateboard", "Bicycle", "Scooter", "Sedan", "Pickup Truck"
         },
         "Storage": {PROGRESSIVE_STORAGE_ITEM},
+        "Staff": set(PROGRESSIVE_STAFF_COUNTS).union(
+            *(set(items) for items in PROGRESSIVE_DLC_STAFF_COUNTS.values())
+        ),
         "Loans": {f"Loan Authorization {i}" for i in range(1, 7)}
     }
 
@@ -262,6 +267,14 @@ class SupermarketWorld(World):
             for _ in range(STORAGE_UPGRADE_COUNT):
                 self.multiworld.push_precollected(self.create_item(PROGRESSIVE_STORAGE_ITEM))
 
+        for item_name, count in PROGRESSIVE_STAFF_COUNTS.items():
+            progression_pool.extend([item_name] * count)
+
+        for dlc_name, staff_counts in PROGRESSIVE_DLC_STAFF_COUNTS.items():
+            if dlc_name in active_dlcs:
+                for item_name, count in staff_counts.items():
+                    progression_pool.extend([item_name] * count)
+
         if "dlc_vending" in active_dlcs:
             vending_slots_count = self.options.vending_machine_slots.value
             for _ in range(vending_slots_count):
@@ -277,7 +290,12 @@ class SupermarketWorld(World):
             if item_name == "Vending Machine Slot":
                 continue
 
-            if item_name in (PROGRESSIVE_SECTION_ITEM, PROGRESSIVE_STORAGE_ITEM):
+            if item_name in {
+                PROGRESSIVE_SECTION_ITEM,
+                PROGRESSIVE_STORAGE_ITEM,
+                *PROGRESSIVE_STAFF_COUNTS,
+                *(name for items in PROGRESSIVE_DLC_STAFF_COUNTS.values() for name in items),
+            }:
                 continue
 
             # DLC Handling

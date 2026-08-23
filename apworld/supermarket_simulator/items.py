@@ -12,6 +12,17 @@ PROGRESSIVE_SECTION_ITEM = "Progressive Section Room Upgrade"
 PROGRESSIVE_STORAGE_ITEM = "Progressive Storage Room Upgrade"
 SECTION_UPGRADE_COUNT = 32
 STORAGE_UPGRADE_COUNT = 20
+PROGRESSIVE_STAFF_COUNTS = {
+    "Progressive Cashier": 6,
+    "Progressive Janitor": 3,
+    "Progressive Restocker": 6,
+    "Progressive Security Guard": 2,
+    "Progressive Customer Helper": 6,
+}
+PROGRESSIVE_DLC_STAFF_COUNTS = {
+    "dlc_bakery": {"Progressive Baker": 2},
+    "dlc_ice_cream": {"Progressive Ice Cream Helper": 2},
+}
 
 item_table = {
     # === LICENSES (Offset 100+) ===
@@ -51,17 +62,11 @@ item_table = {
     PROGRESSIVE_SECTION_ITEM: ItemData(201, ItemClassification.progression),
 
     # === STAFF (Offset 300+) ===
-    "Cashier 1": ItemData(301, ItemClassification.progression),
-    **{f"Cashier {i}": ItemData(300 + i, ItemClassification.useful) for i in range(2, 7)},
-
-    **{f"Janitor {i}": ItemData(310 + i, ItemClassification.useful) for i in range(1, 4)},
-
-    "Restocker 1": ItemData(321, ItemClassification.progression),
-    **{f"Restocker {i}": ItemData(320 + i, ItemClassification.useful) for i in range(2, 7)},
-
-    **{f"Security Guard {i}": ItemData(330 + i, ItemClassification.useful) for i in range(1, 3)},
-
-    **{f"Customer Helper {i}": ItemData(340 + i, ItemClassification.useful) for i in range(1, 7)},
+    "Progressive Cashier": ItemData(301, ItemClassification.progression),
+    "Progressive Janitor": ItemData(311, ItemClassification.progression),
+    "Progressive Restocker": ItemData(321, ItemClassification.progression),
+    "Progressive Security Guard": ItemData(331, ItemClassification.progression),
+    "Progressive Customer Helper": ItemData(341, ItemClassification.progression),
 
 
     # === VEHICLES (Offset 350+) ===
@@ -159,16 +164,14 @@ dlc_licenses = {
         "License 66": ItemData(166, ItemClassification.progression),
         "License 67": ItemData(167, ItemClassification.progression),
         "License 68": ItemData(168, ItemClassification.progression),
-        "Baker 1": ItemData(901, ItemClassification.progression),
-        "Baker 2": ItemData(902, ItemClassification.useful),
+        "Progressive Baker": ItemData(901, ItemClassification.progression),
         "Single Bakery Shelf": ItemData(435, ItemClassification.progression),
         "Bakery Shelf": ItemData(436, ItemClassification.useful),
         "Oven": ItemData(434, ItemClassification.progression),
     },
     "dlc_ice_cream": {
         "License 69": ItemData(169, ItemClassification.progression),
-        "Ice Cream Helper 1": ItemData(911, ItemClassification.progression),
-        "Ice Cream Helper 2": ItemData(912, ItemClassification.useful),
+        "Progressive Ice Cream Helper": ItemData(911, ItemClassification.progression),
         "Ice Cream Stand": ItemData(437, ItemClassification.progression),
     },
     "dlc_vending": {

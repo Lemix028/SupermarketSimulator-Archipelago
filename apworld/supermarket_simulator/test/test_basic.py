@@ -2,7 +2,12 @@ import unittest
 from test.bases import WorldTestBase
 from BaseClasses import ItemClassification
 from worlds.supermarket_simulator.options import StartingLicenses, DisabledTraps, StartingFurniture
-from worlds.supermarket_simulator.items import PROGRESSIVE_SECTION_ITEM, PROGRESSIVE_STORAGE_ITEM
+from worlds.supermarket_simulator.items import (
+    PROGRESSIVE_SECTION_ITEM,
+    PROGRESSIVE_STORAGE_ITEM,
+    PROGRESSIVE_STAFF_COUNTS,
+    PROGRESSIVE_DLC_STAFF_COUNTS,
+)
 from Fill import distribute_items_restrictive
 
 class SupermarketSimulatorTestBase(WorldTestBase):
@@ -19,7 +24,14 @@ class SupermarketSimulatorTestBase(WorldTestBase):
 
 
 class TestSupermarketSimulatorDefault(SupermarketSimulatorTestBase):
-    pass
+    def test_progressive_staff_counts(self) -> None:
+        self.world_setup()
+        for item_name, expected_count in PROGRESSIVE_STAFF_COUNTS.items():
+            self.assertEqual(len(self.get_items_by_name(item_name)), expected_count)
+
+        for staff_counts in PROGRESSIVE_DLC_STAFF_COUNTS.values():
+            for item_name in staff_counts:
+                self.assertEqual(len(self.get_items_by_name(item_name)), 0)
 
 
 class TestSupermarketSimulatorGoalAllLicenses(SupermarketSimulatorTestBase):
@@ -75,6 +87,10 @@ class TestSupermarketSimulatorAllDLCsActive(SupermarketSimulatorTestBase):
         self.assertIn("License 69", pool_item_names)
         self.assertIn("License 66", pool_item_names)
         self.assertIn("License 51", pool_item_names)
+
+        for staff_counts in PROGRESSIVE_DLC_STAFF_COUNTS.values():
+            for item_name, expected_count in staff_counts.items():
+                self.assertEqual(pool_item_names.count(item_name), expected_count)
 
 
 class TestSupermarketSimulatorNoDLCsActive(SupermarketSimulatorTestBase):
@@ -498,4 +514,3 @@ class TestSupermarketSimulatorFullLocalFill(SupermarketSimulatorTestBase):
         unfilled = [loc for loc in checkout_locations if loc.item is None]
         self.assertEqual(len(prefilled), 100)
         self.assertEqual(len(unfilled), 0)
-
