@@ -1,5 +1,6 @@
 from worlds.AutoWorld import World
 from BaseClasses import Region, Entrance, Location, ItemClassification
+from itertools import chain
 from .items import (
     item_table,
     SupermarketItem,
@@ -10,6 +11,7 @@ from .items import (
     STORAGE_UPGRADE_COUNT,
     PROGRESSIVE_STAFF_COUNTS,
     PROGRESSIVE_DLC_STAFF_COUNTS,
+    DAY_AND_LEVEL_PROGRESSION_ITEMS,
 )
 from .locations import location_table
 from .options import SupermarketOptions
@@ -42,6 +44,7 @@ class SupermarketWorld(World):
     settings_key = "supermarket_simulator_options"
 
     web = SupermarketSimulatorWebWorld()
+    total_relevant_progression_items: int = 0
 
     item_name_groups = {
         "Licenses": {name for name in item_table if name.startswith("License ")},
@@ -186,6 +189,7 @@ class SupermarketWorld(World):
         return ids
 
     def get_filler_item_name(self) -> str:
+        """Return a configured filler item or trap without reviving zero-weight fillers."""
         disabled_traps = self.options.disabled_traps.value
         all_traps = ["Tax Audit Trap", "Dust Storm Trap", "Power Outage Trap", "Trash Flood Trap", "Expired Products Trap", "Robbery Trap"]
         active_traps = [trap for trap in all_traps if trap not in disabled_traps]
@@ -193,17 +197,34 @@ class SupermarketWorld(World):
         filler_choices = ["Money Boost", "XP Boost"]
         filler_weights = [self.options.filler_money_weight.value, self.options.filler_xp_weight.value]
 
-        if self.options.enable_blackfriday_events:
+        if self.options.enable_blackfriday_events.value:
             filler_choices.append("Blackfriday")
             filler_weights.append(self.options.filler_blackfriday_weight.value)
 
-        if sum(filler_weights) == 0:
-            filler_weights = [50] * len(filler_choices)
+        filler_pool = [
+            (name, weight)
+            for name, weight in zip(filler_choices, filler_weights)
+            if weight > 0
+        ]
 
-        if self.options.enable_traps and active_traps and self.multiworld.random.randint(1, 100) <= self.options.trap_frequency.value:
+        traps_enabled = bool(self.options.enable_traps.value and active_traps)
+        if (
+            traps_enabled
+            and self.multiworld.random.randint(1, 100) <= self.options.trap_frequency.value
+        ):
             return self.multiworld.random.choice(active_traps)
-        else:
-            return self.multiworld.random.choices(filler_choices, weights=filler_weights, k=1)[0]
+
+        if filler_pool:
+            names, weights = zip(*filler_pool)
+            return self.multiworld.random.choices(names, weights=weights, k=1)[0]
+
+        # Zero weights mean that no booster may be generated. If traps are
+        # available, use one regardless of trap_frequency rather than silently
+        # re-enabling disabled fillers.
+        if traps_enabled:
+            return self.multiworld.random.choice(active_traps)
+
+        raise Exception("No filler items or traps are available.")
 
     def create_items(self) -> None:
         starting_items = self.get_starting_items()
@@ -349,6 +370,21 @@ class SupermarketWorld(World):
       
         self.multiworld.itempool.extend(itempool)
 
+        # Rules are installed after create_items, so this reflects the exact
+        # pool and precollected inventory produced by the current options.
+        generated_items = (
+            item for item in chain(
+                self.multiworld.itempool,
+                self.multiworld.precollected_items[self.player],
+            )
+            if item.player == self.player
+        )
+        self.total_relevant_progression_items = sum(
+            1 for item in generated_items
+            if item.name in DAY_AND_LEVEL_PROGRESSION_ITEMS
+            and item.classification & ItemClassification.progression
+        )
+
     def create_item(self, name: str) -> SupermarketItem:
         # Victory is an event item with no network ID
         if name == "Victory":
@@ -370,21 +406,6 @@ class SupermarketWorld(World):
     def set_rules(self) -> None:
         from .rules import set_rules as _set_rules
         _set_rules(self)
-
-    def get_filler_item_name(self) -> str:
-        """Returns a random booster/trap item to be used as filler, avoiding progression items."""
-        choices = ["Money Boost", "XP Boost"]
-        weights = [self.options.filler_money_weight.value, self.options.filler_xp_weight.value]
-
-        if self.options.enable_blackfriday_events:
-            choices.append("Blackfriday")
-            weights.append(self.options.filler_blackfriday_weight.value)
-
-        # Fallback if player set all weights to 0
-        if sum(weights) == 0:
-            return self.multiworld.random.choice(choices)
-
-        return self.multiworld.random.choices(choices, weights=weights, k=1)[0]
 
     def generate_early(self) -> None:
         if self.options.store_level_interval.value > self.options.max_store_level.value:

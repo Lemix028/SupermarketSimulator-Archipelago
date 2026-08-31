@@ -191,3 +191,15 @@ ALL_FURNITURE = [
 ]
 ALL_VEHICLES = ["Skateboard", "Bicycle", "Scooter", "Sedan", "Pickup Truck"]
 ALL_TRAPS = [name for name in item_table.keys() if name.endswith("Trap")]
+
+# Only these item names drive the percentage gates on Day and Store Level
+# locations.  This is deliberately a whitelist rather than a classification
+# lookup: furniture and any future progression items must not silently change
+# the milestone logic.
+DAY_AND_LEVEL_PROGRESSION_ITEMS = frozenset({
+    *ALL_LICENSES,
+    PROGRESSIVE_SECTION_ITEM,
+    PROGRESSIVE_STORAGE_ITEM,
+    *PROGRESSIVE_STAFF_COUNTS,
+    *(item_name for staff in PROGRESSIVE_DLC_STAFF_COUNTS.values() for item_name in staff),
+})

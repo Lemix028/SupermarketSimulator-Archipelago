@@ -275,6 +275,13 @@ class ExcludeLicenses(OptionSet):
                 raise ValueError(f"All active product licenses are excluded for {player_name}'s slot while Goal is set to 'All Licenses'.")
         super().verify(world, player_name, plando_options)
 
+class ExcludeProgressionFromLateChecks(Toggle):
+    """Prevents items with any progression classification from being placed in the final 20% of generated Day and Store Level locations.
+    This applies to items for every player. Filler, traps, and useful-only items remain allowed.
+    Recommended: Disabled."""
+    display_name = "Exclude Progression From Late Checks"
+    default = 0
+
 class CheckoutIncomeMultiplier(Range):
     """Multiplies the payout received at the cash register/self-checkout when customers pay.
     Represented in percentage (100 = 1.0x, 120 = 1.2x, 80 = 0.8x).
@@ -384,6 +391,7 @@ class SupermarketOptions(PerGameCommonOptions):
     starting_vehicles: StartingVehicles
     starting_furniture: StartingFurniture
     exclude_licenses: ExcludeLicenses
+    exclude_progression_from_late_checks: ExcludeProgressionFromLateChecks
     enable_traps: EnableTraps
     trap_frequency: TrapFrequency
     disabled_traps: DisabledTraps

@@ -1,6 +1,44 @@
-from worlds.generic.Rules import set_rule, add_rule
-from BaseClasses import CollectionState
-from .items import PROGRESSIVE_SECTION_ITEM, PROGRESSIVE_STORAGE_ITEM
+from worlds.generic.Rules import set_rule, add_rule, add_item_rule
+from BaseClasses import CollectionState, ItemClassification
+from .items import (
+    DAY_AND_LEVEL_PROGRESSION_ITEMS,
+    PROGRESSIVE_SECTION_ITEM,
+    PROGRESSIVE_STORAGE_ITEM,
+)
+
+
+def _numeric_requirement(location_name: str) -> int:
+    """Return the numeric requirement from either supported milestone name."""
+    if location_name.startswith("Store Level "):
+        return int(location_name.removeprefix("Store Level "))
+    return int(location_name.removeprefix("Day ").removesuffix(" Completed"))
+
+
+def _add_percentage_tier_rules(world, locations) -> None:
+    """Split one sorted milestone family into five percentage-based tiers."""
+    locations = sorted(locations, key=lambda location: _numeric_requirement(location.name))
+    location_count = len(locations)
+    if not location_count:
+        return
+
+    player = world.player
+    total_items = world.total_relevant_progression_items
+    for index, location in enumerate(locations):
+        tier = min(4, index * 5 // location_count)
+        required_items = (total_items * tier + 4) // 5 if total_items else 0
+        add_rule(
+            location,
+            lambda state, required=required_items: sum(
+                state.count(item_name, player)
+                for item_name in DAY_AND_LEVEL_PROGRESSION_ITEMS
+            ) >= required,
+        )
+
+        if tier == 4 and world.options.exclude_progression_from_late_checks.value:
+            add_item_rule(
+                location,
+                lambda item: not (item.classification & ItemClassification.progression),
+            )
 
 
 def set_rules(self) -> None:
@@ -18,6 +56,21 @@ def set_rules(self) -> None:
       2 (All Licenses)- Collect every product license available in the item pool.
     """
     player = self.player
+
+    day_locations = []
+    store_level_locations = []
+    for location in self.multiworld.get_locations(player):
+        if location.address is None:
+            continue
+        if location.name.startswith("Day ") and location.name.endswith(" Completed"):
+            day_locations.append(location)
+        elif location.name.startswith("Store Level "):
+            store_level_locations.append(location)
+
+    # Keep the two families independent: changing one interval or maximum must
+    # never move checks in the other family between tiers.
+    _add_percentage_tier_rules(self, day_locations)
+    _add_percentage_tier_rules(self, store_level_locations)
 
     # 1. Storage Room Upgrade Item Rules
     if self.options.enable_storage_locks.value:

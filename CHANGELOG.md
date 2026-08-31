@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.4] - 31.08.2026
+
+### APWorld
+
+#### Added
+- Percentage-based progression tiers for Day and Store Level checks.
+- Option to exclude progression items from the final 20% of Day and Store Level checks.
+
+#### Fixed
+- Zero-weight filler options no longer silently re-enable Money, XP, or Black Friday fillers.
+- Trap frequency and disabled-trap settings are now respected by filler generation.
+
 ## [0.3.3] - 23.08.2026
 
 ### APWorld
