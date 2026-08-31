@@ -117,18 +117,22 @@ def set_rules(self) -> None:
     victory_location = self.multiworld.get_location("Victory", player)
 
     if goal_value == 0:
-        # --- Goal: Reach Max Store Level ---
-        max_level = self.options.max_store_level.value
-        goal_loc_name = f"Store Level {max_level}"
+        # --- Goal: Reach Highest Generated Store Level ---
+        goal_loc_name = max(
+            store_level_locations,
+            key=lambda location: _numeric_requirement(location.name),
+        ).name
         set_rule(
             victory_location,
             lambda state, target=goal_loc_name: state.can_reach(target, "Location", player)
         )
 
     elif goal_value == 1:
-        # --- Goal: Reach Max Days Completed ---
-        max_days = self.options.max_days_completed.value
-        goal_loc_name = f"Day {max_days} Completed"
+        # --- Goal: Reach Highest Generated Days Milestone ---
+        goal_loc_name = max(
+            day_locations,
+            key=lambda location: _numeric_requirement(location.name),
+        ).name
         set_rule(
             victory_location,
             lambda state, target=goal_loc_name: state.can_reach(target, "Location", player)

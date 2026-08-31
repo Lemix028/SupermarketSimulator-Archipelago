@@ -741,6 +741,60 @@ class TestSupermarketSimulatorDifferentMilestoneIntervals(SupermarketSimulatorTe
         self.assertEqual([loc.name for loc in day_locations], [f"Day {day} Completed" for day in range(11, 56, 11)])
 
 
+class TestSupermarketSimulatorNonDivisibleLevelGoal(SupermarketSimulatorTestBase):
+    options = {
+        "goal": 0,
+        "max_store_level": 50,
+        "store_level_interval": 3,
+        "max_days_completed": 100,
+        "days_completed_interval": 3,
+    }
+
+    def test_level_goal_uses_highest_generated_location(self) -> None:
+        self.world_setup()
+        self.assertIsNotNone(self.multiworld.get_location("Store Level 48", self.player))
+        with self.assertRaises(KeyError):
+            self.multiworld.get_location("Store Level 50", self.player)
+
+        target = {}
+
+        class State:
+            def can_reach(self, location_name, *args):
+                target["name"] = location_name
+                return True
+
+        victory_location = self.multiworld.get_location("Victory", self.player)
+        self.assertTrue(victory_location.access_rule(State()))
+        self.assertEqual(target["name"], "Store Level 48")
+
+
+class TestSupermarketSimulatorNonDivisibleDaysGoal(SupermarketSimulatorTestBase):
+    options = {
+        "goal": 1,
+        "max_store_level": 50,
+        "store_level_interval": 3,
+        "max_days_completed": 100,
+        "days_completed_interval": 3,
+    }
+
+    def test_days_goal_uses_highest_generated_location(self) -> None:
+        self.world_setup()
+        self.assertIsNotNone(self.multiworld.get_location("Day 99 Completed", self.player))
+        with self.assertRaises(KeyError):
+            self.multiworld.get_location("Day 100 Completed", self.player)
+
+        target = {}
+
+        class State:
+            def can_reach(self, location_name, *args):
+                target["name"] = location_name
+                return True
+
+        victory_location = self.multiworld.get_location("Victory", self.player)
+        self.assertTrue(victory_location.access_rule(State()))
+        self.assertEqual(target["name"], "Day 99 Completed")
+
+
 class TestSupermarketSimulatorLateCheckItemRulesOff(SupermarketSimulatorTestBase):
     options = {
         "max_store_level": 11,
